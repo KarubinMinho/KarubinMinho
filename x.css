@@ -1,0 +1,16 @@
+.outer-box {
+    float: right;
+}
+
+.inner-box {
+  float: right;
+  width: 60%;
+  background: #F9F7F6;
+  color: #F24088;
+  border-top: 3px solid #EAEFEE;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
+}
+
+#github-readme-stats {
+  width: 100%;
+}

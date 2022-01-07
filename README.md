@@ -46,34 +46,13 @@ Here are some ideas to get you started:
 
 #### 🐳 Programming languages and tools
 
-<!-- markdownlint-disable MD018 -->
-<style type="text/css" rel="stylesheet">
-.outer-box {
-    float: right;
-}
-.inner-box {
-  float: right;
-  width: 60%;
-  background: #F9F7F6;
-  color: #F24088;
-  border-top: 3px solid #EAEFEE;
-  box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
-}
-#github-readme-stats {
-  width: 100%;
-}
-</style>
-
-<div class="outer-box">
 <!-- GitHub readme stats  -->
-<div class="inner-box">📖 ilolicon's GitHub Stats
-<img id="github-readme-stats" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&hide_border=true"/>
-</div>
+📖 ilolicon's GitHub Stats
+<img style="float: right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&hide_border=true"/>
 
 <!-- top languages  -->
-<div class="inner-box">🌊 Common Language Statistics
-<img id="github-readme-stats" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=true&hide_border=true"/>
-</div>
+🌊 Common Language Statistics
+<img style="float: right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=true&hide_border=true"/>
 
 ##### ✨ DevOps Tools
 
@@ -129,3 +108,5 @@ Here are some ideas to get you started:
 <a href="https://vuejs.org">
 <img src="svg/vuejs-original-wordmark.svg">
 </div>
+
+==========
