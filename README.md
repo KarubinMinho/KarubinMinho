@@ -30,23 +30,23 @@ Here are some ideas to get you started:
 [![Mail](https://img.shields.io/badge/Mail-EA4335?style=flat&logo=Gmail&logoColor=white)](mailto:97431110@qq.com)
 
 <!-- markdownlint-disable MD033 -->
-<img align="right" src="/image/sidebar.jpg" width="50%" height="auto" />
+<img align="right" src="/image/riven.jpg" width="50%" height="auto" />
 
-#### 🌱 I'm currently working on
+#### 💫 I'm currently working on
 
 - CMDB多云平台开发
 - Golang技术栈深入
 - 容器及容器编排学习(Cloud Native)
 - ...
 
-#### :muscle: I'm challenging myself with
+#### ⭐ I'm challenging myself with
 
 - [Golang](https://golang.google.cn/)
 - [Kubernetes](https://kubernetes.io/)
 - CICD && Automation of daily work tasks
 - ...
 
-#### :computer: Programming languages and tools
+#### 🐳 Programming languages and tools
 
 <!-- GitHub readme stats  -->
 <img width="60%" align="right" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=onedark&count_private=true"/>
@@ -54,13 +54,19 @@ Here are some ideas to get you started:
 <!-- top languages  -->
 <img width="60%" align="right" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss"/>
 
-##### :cloud: OS
+##### ✨ OS
 
 <a href="https://www.linux.org">
 <img src="svg/linux-original.svg">
 
 <a href="https://git-scm.com">
 <img src="svg/git-scm-icon.svg">
+
+<a href="https://www.ansible.com">
+<img src="svg/ansible-icon.svg">
+
+<a href="https://saltproject.io">
+<img src="svg/saltstack-icon.svg">
 
 <a href="https://www.jenkins.io">
 <img src="svg/jenkins-icon.svg">
@@ -77,7 +83,7 @@ Here are some ideas to get you started:
 <a href="https://kubernetes.io">
 <img src="svg/kubernetes-icon.svg">
 
-##### :cloud: Languages
+##### ✨ Languages
 
 <a href="https://www.gnu.org/software/bash">
 <img src="svg/gnu_bash-icon.svg"/>
@@ -91,7 +97,7 @@ Here are some ideas to get you started:
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">
 <img src="svg/jsvascript-original.svg">
 
-##### :cloud: Frameworks
+##### ✨ Frameworks
 
 <a href="https://www.djangoproject.com">
 <img src="svg/django-original.svg">
