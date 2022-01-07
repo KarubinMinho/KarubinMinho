@@ -48,11 +48,11 @@ Here are some ideas to get you started:
 
 <!-- GitHub readme stats  -->
 📖 ilolicon's GitHub Stats
-<img style="float: right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&hide_border=true"/>
+<img align="right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&hide_border=true"/>
 
 <!-- top languages  -->
 🌊 Common Language Statistics
-<img style="float: right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=true&hide_border=true"/>
+<img align="right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=true&hide_border=true"/>
 
 ##### ✨ DevOps Tools
 
