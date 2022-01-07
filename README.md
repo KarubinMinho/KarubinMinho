@@ -17,7 +17,7 @@ Here are some ideas to get you started:
        (_) /___  / (_)________  ____ 
       / / / __ \/ / / ___/ __ \/ __ \
      / / / /_/ / / / /__/ /_/ / / / /
-    /_/_/\____/_/_/\___/\____/_/ /_/    -- keep calm and carry on
+    /_/_/\____/_/_/\___/\____/_/ /_/    -- Keep Calm And Carry On.
 
 *Welcome to my **GitHub** page.*
 *I'm now an **OPS** engineer, and working towards **SRE/DevOps.***
@@ -47,12 +47,10 @@ Here are some ideas to get you started:
 #### 🐳 Programming languages and tools
 
 <!-- GitHub readme stats  -->
-📖 ilolicon's GitHub Stats
-<img align="right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&hide_border=true"/>
+<img align="right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&locale=cn&bg_color=282A36"/>
 
 <!-- top languages  -->
-🌊 Common Language Statistics
-<img align="right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=true&hide_border=true"/>
+<img align="right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=dracula&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=false&locale=cn"/>
 
 ##### ✨ DevOps Tools
 
@@ -107,6 +105,3 @@ Here are some ideas to get you started:
 
 <a href="https://vuejs.org">
 <img src="svg/vuejs-original-wordmark.svg">
-</div>
-
-==========
