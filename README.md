@@ -11,19 +11,16 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ... -->
 
-<!-- markdownlint-disable MD041 -->
-## Hi there 👋
-
-### This is ilolicon
+# ⭐ Hi, there
 
         _ __      ___                
        (_) /___  / (_)________  ____ 
       / / / __ \/ / / ___/ __ \/ __ \
      / / / /_/ / / / /__/ /_/ / / / /
-    /_/_/\____/_/_/\___/\____/_/ /_/ 
+    /_/_/\____/_/_/\___/\____/_/ /_/    -- keep calm and carry on
 
-*Welcome to my GitHub page.*
-*I'm now an OPS engineer, and working towards SRE/DevOps.*
+*Welcome to my **GitHub** page.*
+*I'm now an **OPS** engineer, and working towards **SRE/DevOps.***
 
 [![Github](https://img.shields.io/badge/-Github-000?style=flat&logo=Github&logoColor=white)](https://github.com/KarubinMinho)
 [![HEXO](https://img.shields.io/badge/Hexo-0E83CD?style=flat&logo=Hexo&logoColor=white)](https://karubinminho.github.io/)
@@ -32,6 +29,7 @@ Here are some ideas to get you started:
 <!-- markdownlint-disable MD033 -->
 <img align="right" src="/image/riven.jpg" width="50%" height="auto" />
 
+<!-- markdownlint-disable MD001 -->
 #### 💫 I'm currently working on
 
 - CMDB多云平台开发
@@ -48,13 +46,36 @@ Here are some ideas to get you started:
 
 #### 🐳 Programming languages and tools
 
+<!-- markdownlint-disable MD018 -->
+<style type="text/css" rel="stylesheet">
+.outer-box {
+    float: right;
+}
+.inner-box {
+  float: right;
+  width: 60%;
+  background: #F9F7F6;
+  color: #F24088;
+  border-top: 3px solid #EAEFEE;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
+}
+#github-readme-stats {
+  width: 100%;
+}
+</style>
+
+<div class="outer-box">
 <!-- GitHub readme stats  -->
-<img width="60%" align="right" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=onedark&count_private=true"/>
+<div class="inner-box">📖 ilolicon's GitHub Stats
+<img id="github-readme-stats" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&hide_border=true"/>
+</div>
 
 <!-- top languages  -->
-<img width="60%" align="right" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss"/>
+<div class="inner-box">🌊 Common Language Statistics
+<img id="github-readme-stats" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=true&hide_border=true"/>
+</div>
 
-##### ✨ OS
+##### ✨ DevOps Tools
 
 <a href="https://www.linux.org">
 <img src="svg/linux-original.svg">
@@ -107,3 +128,4 @@ Here are some ideas to get you started:
 
 <a href="https://vuejs.org">
 <img src="svg/vuejs-original-wordmark.svg">
+</div>
