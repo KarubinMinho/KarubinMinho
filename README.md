@@ -13,7 +13,7 @@ Here are some ideas to get you started:
 
 # ⭐ Hi, there
 
-![icons](svg/riven-iron.svg)
+![icons](svg/top-icon.svg)
 
         _ __      ___                
        (_) /___  / (_)________  ____ 
@@ -29,7 +29,7 @@ Here are some ideas to get you started:
 [![Mail](https://img.shields.io/badge/Mail-EA4335?style=flat&logo=Gmail&logoColor=white)](mailto:97431110@qq.com)
 
 <!-- markdownlint-disable MD033 -->
-<img align="right" src="/image/riven.jpg" width="50%" height="auto" />
+<img align="right" src="/image/sidebar.jpg" width="50%" />
 
 <!-- markdownlint-disable MD001 -->
 #### 💫 I'm currently working on
@@ -49,61 +49,86 @@ Here are some ideas to get you started:
 #### 🐳 Programming languages and tools
 
 <!-- GitHub readme stats  -->
-<img align="right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=radical&count_private=true&include_all_commits=true&locale=cn&bg_color=282A36"/>
+<img align="right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=onedark&count_private=true&include_all_commits=true&locale=cn&bg_color=FFFFFF&hide_border=true"/>
 
 <!-- top languages  -->
-<img align="right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&show_icons=true&theme=dracula&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=false&locale=cn"/>
+<img align="right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=false&locale=cn&bg_color=FFFFFF&hide_border=true"/>
 
 ##### ✨ DevOps Tools
 
 <a href="https://www.linux.org">
-<img src="svg/linux-original.svg">
+  <img src="svg/linux-original.svg">
+</a>
 
 <a href="https://git-scm.com">
-<img src="svg/git-scm-icon.svg">
+  <img src="svg/git-scm-icon.svg">
+</a>
 
 <a href="https://www.ansible.com">
-<img src="svg/ansible-icon.svg">
+  <img src="svg/ansible-icon.svg">
+</a>
 
 <a href="https://saltproject.io">
-<img src="svg/saltstack-icon.svg">
+  <img src="svg/saltstack-icon.svg">
+</a>
 
 <a href="https://www.jenkins.io">
-<img src="svg/jenkins-icon.svg">
+  <img src="svg/jenkins-icon.svg">
+</a>
 
 <a href="https://www.mysql.com">
-<img src="svg/mysql-original-wordmark.svg">
+  <img src="svg/mysql-original-wordmark.svg">
+</a>
 
 <a href="https://redis.io">
-<img src="svg/redis-original-wordmark.svg">
+  <img src="svg/redis-original-wordmark.svg">
+</a>
 
 <a href="https://www.docker.com">
-<img src="svg/docker-original-wordmark.svg">
+  <img src="svg/docker-original-wordmark.svg">
+</a>
 
 <a href="https://kubernetes.io">
-<img src="svg/kubernetes-icon.svg">
+  <img src="svg/kubernetes-icon.svg">
+</a>
 
 ##### ✨ Languages
 
 <a href="https://www.gnu.org/software/bash">
-<img src="svg/gnu_bash-icon.svg"/>
+  <img src="svg/gnu_bash-icon.svg"/>
+</a>
 
 <a href="https://golang.org">
-<img src="svg/go-original.svg">
+  <img src="svg/go-original.svg">
+</a>
 
 <a href="https://www.python.org">
-<img src="svg/python-original.svg">
+  <img src="svg/python-original.svg">
+</a>
 
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">
-<img src="svg/jsvascript-original.svg">
+  <img src="svg/jsvascript-original.svg">
+</a>
 
 ##### ✨ Frameworks
 
 <a href="https://www.djangoproject.com">
-<img src="svg/django-original.svg">
+  <img src="svg/django-original.svg">
+</a>
 
 <a href="https://flask.palletsprojects.com">
-<img src="svg/pocoo_flask-icon.svg">
+  <img src="svg/pocoo_flask-icon.svg">
+</a>
 
 <a href="https://vuejs.org">
-<img src="svg/vuejs-original-wordmark.svg">
+  <img src="svg/vuejs-original-wordmark.svg">
+</a>
+
+<!-- pin repo -->
+<a href="https://github.com/ilolicon/ilolicon">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=ilolicon&repo=ilolicon&show_owner=true">
+</a>
+
+<a href="https://github.com/ilolicon/ilolicon">
+  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=ilolicon&repo=ilolicon.github.io&show_owner=true">
+</a>
