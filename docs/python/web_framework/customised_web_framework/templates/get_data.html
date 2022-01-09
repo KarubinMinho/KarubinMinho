@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GetDict</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h1 class="text-center">员工数据</h1>
+        <table class="table table-hover table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>生日</th>
+                <th>name</th>
+                <th>性别</th>
+                <th>进入公司日期</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!--[{}, {}, {}]-->
+                {% for emp in emp_list %}
+                    <tr>
+                        <td>{{ emp.emp_no }}</td>
+                        <td>{{ emp.birth_date }}</td>
+                        <td>{{ emp.first_name + ' ' + emp.last_name }}</td>
+                        <td>{{ emp.gender }}</td>
+                        <td>{{ emp.hire_date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+# GeoIP2
+
+## 依赖
+```bash
+ENV: python3.x
+PKG: netaddr 
+```
+
+## US State
+```
+('NE', 'Nebraska')
+('SD', 'South Dakota')
+('IN', 'Indiana')
+('CO', 'Colorado')
+('NJ', 'New Jersey')
+('KY', 'Kentucky')
+('IL', 'Illinois')
+('RI', 'Rhode Island')
+('DC', 'District of Columbia')
+('UT', 'Utah')
+('AK', 'Alaska')
+('AL', 'Alabama')
+('WI', 'Wisconsin')
+('IA', 'Iowa')
+('MO', 'Missouri')
+('CA', 'California')
+('NH', 'New Hampshire')
+('VA', 'Virginia')
+('NV', 'Nevada')
+('MN', 'Minnesota')
+('ND', 'North Dakota')
+('SC', 'South Carolina')
+('OH', 'Ohio')
+('WV', 'West Virginia')
+('FL', 'Florida')
+('DE', 'Delaware')
+('VT', 'Vermont')
+('WA', 'Washington')
+('PA', 'Pennsylvania')
+('MI', 'Michigan')
+('TN', 'Tennessee')
+('NM', 'New Mexico')
+('LA', 'Louisiana')
+('MT', 'Montana')
+('HI', 'Hawaii')
+('MA', 'Massachusetts')
+('AZ', 'Arizona')
+('WY', 'Wyoming')
+('NY', 'New York')
+('OK', 'Oklahoma')
+('ID', 'Idaho')
+('NC', 'North Carolina')
+('TX', 'Texas')
+('MS', 'Mississippi')
+('KS', 'Kansas')
+('ME', 'Maine')
+('CT', 'Connecticut')
+('GA', 'Georgia')
+('MD', 'Maryland')
+('AR', 'Arkansas')
+('OR', 'Oregon')
+```
