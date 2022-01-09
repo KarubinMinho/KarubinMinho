@@ -29,7 +29,7 @@ Here are some ideas to get you started:
 [![Mail](https://img.shields.io/badge/Mail-EA4335?style=flat&logo=Gmail&logoColor=white)](mailto:97431110@qq.com)
 
 <!-- markdownlint-disable MD033 -->
-<img align="right" src="/image/sidebar.jpg" width="50%" />
+<img align="right" src="/image/sidebar.jpg" width="60%" />
 
 <!-- markdownlint-disable MD001 -->
 #### 💫 I'm currently working on
