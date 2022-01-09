@@ -52,7 +52,7 @@ Here are some ideas to get you started:
 <img align="right" width="60%" src="https://github-readme-stats.vercel.app/api?username=ilolicon&show_icons=true&theme=onedark&count_private=true&include_all_commits=true&locale=cn&bg_color=FFFFFF&hide_border=true"/>
 
 <!-- top languages  -->
-<img align="right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&theme=onedark&layout=compact&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=false&locale=cn&bg_color=FFFFFF&hide_border=true"/>
+<img align="right" width="60%" src="https://github-readme-stats-ilolicon.vercel.app/api/top-langs?username=ilolicon&theme=onedark&layout=default&count_private=true&hide=html,jupyter%20notebook,css,scss&hide_title=false&locale=cn&bg_color=FFFFFF&hide_border=true&card_width=500"/>
 
 ##### ✨ DevOps Tools
 
