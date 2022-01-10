@@ -123,12 +123,3 @@ Here are some ideas to get you started:
 <a href="https://vuejs.org">
   <img src="svg/vuejs-original-wordmark.svg">
 </a>
-
-<!-- pin repo -->
-<a href="https://github.com/ilolicon/ilolicon">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=ilolicon&repo=ilolicon&show_owner=true">
-</a>
-
-<a href="https://github.com/ilolicon/ilolicon.github.io">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/pin/?username=ilolicon&repo=ilolicon.github.io&show_owner=true">
-</a>
