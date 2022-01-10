@@ -1,0 +1,62 @@
+groups:
+- name: node record # 记录规则
+  rules:
+  - record: node_cpu_usage_rate
+    expr: (1-avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) * 100
+
+  - record: node_mem_usage_rate
+    expr: (1-(node_memory_MemFree_bytes+node_memory_Buffers_bytes+node_memory_Cached_bytes+node_memory_Slab_bytes)/node_memory_MemTotal_bytes) * 100
+
+- name: instance_status.rules
+  rules:
+
+  - alert: InstanceDown
+    expr: up == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "The {{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes"
+
+- name: node_exporter.rules
+  rules:
+
+  - alert: CPU使用率异常
+    expr: ceil(node_cpu_usage_rate) > 80
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High CPU Usage"
+      description: "实例: {{ $labels.instance }} CPU使用率异常,持续2分钟 当前使用率: {{ $value }}%"
+
+  - alert: 内存使用率异常
+    expr: ceil(node_mem_usage_rate) > 80
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High Memory Usage"
+      description: "实例: {{ $labels.instance }} 内存使用率异常,持续2分钟 当前使用率: {{ $value }}%"
+
+- name: nas_exporter.rules
+  rules:
+
+  - alert: 节点通道异常
+    expr: cmdb_tunnels_check == 0 
+    for: 30s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Tunnel {{ $labels.name }} down"
+      description: "节点: {{ $labels.instance }} 通道: {{ $labels.name }} 产生异常"
+
+  - alert: 节点关键进程异常
+    expr: cmdb_processes_check == 0 
+    for: 5s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Process {{ $labels.name }} down"
+      description: "节点: {{ $labels.instance }} 进程异常: {{ $labels.name }}"
