@@ -1,5 +1,6 @@
-# vendoring css file
+# Vendoring html/css file
 *.css linguist-vendored
+*.html linguist-vendored
 
-# unmark paths as documentation
+# Unmark docs as documentation
 docs/** -linguist-documentation
