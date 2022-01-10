@@ -2,4 +2,4 @@
 *.css linguist-vendored
 
 # unmark paths as documentation
-docs/* -linguist-documentation
+docs/** -linguist-documentation
