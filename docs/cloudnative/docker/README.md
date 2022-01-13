@@ -1,4 +1,4 @@
-# Docker Readme
+# 🐳 Docker
 
 [![docker readme](https://img.shields.io/badge/Docker-README-00AADA)](https://docs.docker.com/)
 
@@ -175,3 +175,50 @@ docker-ce # 社区版
 - A container is a runnable instance of an image
 - You can create/start/stop/move or delete a container using the Docker API or CLI
 - You can connect a container to one or more networks, attach storage to it, or even create a new image based on its current state
+
+### docker install
+
+[Install Docker Engine](https://docs.docker.com/engine/install/)
+[阿里云Mirrors docker-ce](https://mirrors.aliyun.com/docker-ce/)
+
+#### docker-ce.repo
+
+```bash
+[docker-ce-stable]
+name=Docker CE Stable - $basearch
+baseurl=https://download.docker.com/linux/centos/$releasever/$basearch/stable
+# baseurl=https://mirrors.aliyun.com/docker-ce/linux/centos/$releasever/$basearch/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+```
+
+#### 镜像加速
+
+- docker cn
+- [阿里云官方镜像加速](https://help.aliyun.com/document_detail/60750.html)
+- 中国科技大学
+
+```json
+# 配置文件
+/etc/docker/daemon.json
+
+# 更换镜像下载仓库链接
+{
+    "registry-mirrors": ["系统分配前缀.mirror.aliyuncs.com "]
+}
+```
+
+### docker cli
+
+[docekr-reference](https://docs.docker.com/reference/)
+
+```bash
+docker --help
+
+# docker event state 涉及部分常用命令
+```
+
+### docker event state
+
+[![docker event state](./icons/docker-event-state.jpg)](https://docs.docker.com/engine/reference/commandline/events/)
