@@ -281,3 +281,80 @@ Docker镜像含有启动容器所需的文件系统及其内容 因此 其用于
   - 维护用户账户/镜像的校验以及公共命名空间的信息
   - 相当于为Registry提供一个完成用户认证等功能的检索接口
   
+#### docker hub
+
+[docker-hub](https://docs.docker.com/docker-hub/)
+
+Docker Hub provides the following major features:
+
+- [Repositories](https://docs.docker.com/docker-hub/repos/): Push and pull container images
+- [Teams & Organizations](https://docs.docker.com/docker-hub/orgs/): Manage access to private repositories of container images
+- [Docker Official Images](https://docs.docker.com/docker-hub/official_images/): Pull and use high-quality container images provided by Docker
+- [Docker Verified Publisher Images](https://docs.docker.com/docker-hub/publish/): Pull and use high- quality container images provided by external vendors
+- [Builds](https://docs.docker.com/docker-hub/builds/): Automatically build container images from GitHub and Bitbucket and push them to Docker Hub
+- [Webhooks](https://docs.docker.com/docker-hub/webhooks/): Trigger actions after a successful push to a repository to integrate Docker Hub with other services
+
+#### docker pull
+
+[pull-commandline](https://docs.docker.com/engine/reference/commandline/pull/)
+[quay.io](https://quay.io/)
+
+```bash
+docker pull <registry>[:port]/[<namespace>/]<name>:<tag>
+
+# e.g:
+# registry: quay.io
+# port: 443(没指定 默认)
+# namespace: coreos
+# name: flannel(repostory名称)
+# tag: v0.15.1-arm64 指定版本
+docker pull quay.io/coreos/flannel:v0.15.1-arm64
+```
+
+| Namespace | Examples(<namespace/name>) |
+|-----|-----|
+| organization | redhat/kubernetes google/kubernetes |
+| login(user name) | alice/application ilolicon/application |
+| role | devel/database test/database prod/database |
+
+#### 镜像的相关操作
+
+![docker image create](./icons/docker-image-create.png)
+
+- 镜像的生成途径
+  - [Dockerfile](https://docs.docker.com/engine/reference/builder/)
+  - [基于容器制作](https://docs.docker.com/engine/reference/commandline/commit/)
+  - Docekr Hub automated builds(仍是基于Dockerfile)
+
+- 另一种镜像分发方式
+  - [docker-save](https://docs.docker.com/engine/reference/commandline/save/)
+  - [docker-load](https://docs.docker.com/engine/reference/commandline/load/)
+
+### 容器虚拟化网络
+
+#### 容器虚拟化网络概述
+
+[容器虚拟化网络](https://www.cnblogs.com/hukey/p/14062579.html)
+
+```bash
+OVS: Open VSwitch
+SDN
+Overlay Network(叠加网络)
+
+# docker默认的三种网络
+[root@master ~]# docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+78fa953ed316   bridge    bridge    local # 桥接 默认NAT桥
+8ec55273feb2   host      host      local # 让容器直接使用宿主机的网络名称空间
+9081fe29a218   none      null      local # 只有lo接口 没有其他网卡
+
+[root@master ~]# yum -y install bridge-utils
+[root@master ~]# brctl show
+```
+
+![Four network container archetypes](./icons/four-network-container-archetypes.png)
+
+- Closed Container
+- Bridged Container(NAT桥接网络 默认)
+- Joined Container(联盟式容器网络 相对隔离 只是共享同一个网络名称空间)
+- Open Container(开放式容器网络 共享宿主机网络名称空间)
