@@ -354,7 +354,127 @@ NETWORK ID     NAME      DRIVER    SCOPE
 
 ![Four network container archetypes](./icons/four-network-container-archetypes.png)
 
+[docker-docs:network overview](https://docs.docker.com/network/)
+
 - Closed Container
 - Bridged Container(NAT桥接网络 默认)
 - Joined Container(联盟式容器网络 相对隔离 只是共享同一个网络名称空间)
 - Open Container(开放式容器网络 共享宿主机网络名称空间)
+
+#### Bridged Containers
+
+```bash
+# Bridged Containers可以为docker run命令使用
+# "--hostname HOSTNAME" 选项为容器指定主机名
+docker run --rm --net bridge --hostname cloudnative.ilolicon.com busybox:latest hostname
+
+# "--dns DNS_SERVER_IP" 选项能够为容器指定所使用的dns服务器地址
+docker run --rm --dns 8.8.8.8 --dns 8.8.4.4 busybox:latest nslookup docker.com
+
+# "--add-host HOSTNAME:IP" 选项能够为容器指定本地主机名解析项
+docker run --rm --dns 172.16.0.1 --add-host "docker.com:172.16.0.100" busybox:latest cat /etc/hosts
+```
+
+##### Opening Inbound Communication / Expose
+
+```bash
+-p选项的使用格式
+
+# 将指定的容器端口<containerPort> 映射至主机所有地址的一个动态端口
+-p <containerPort>
+
+# 将指定的容器端口<containerPort> 映射至指定的主机端口<hostPort>
+-p <hostPort>:<containerPort>
+
+# 将指定的容器端口<containerPort> 映射至主机指定<ip>的动态端口
+-p <ip>::<containerPort>
+
+# 将指定的容器端口<containerPort> 映射至主机指定<ip>的端口<hostPort>
+-p <ip>:<hostPort>:<containerPort>
+
+"动态端口" 指随机端口 具体的映射结果可使用docker port命令查看
+
+Expose端口 还可以参考 -P 选项：暴露容器内部已指定的端口
+```
+
+#### Joined Containers
+
+- 联盟式容器是指使用某个已存在容器的网络接口的容器 接口被联盟内的各容器共享使用
+- 联盟式容器彼此间虽然共享同一个网络名称空间 但其它内部名称空间如: User/Mount等还是隔离的
+- 联盟式容器彼此间存在端口冲突的可能性 使用此种模式的网络模型情况
+  - 多个容器上的程序需要程序loopback接口互相通信
+  - 对某已存的容器的网络属性进行监控
+
+```bash
+# 创建一个监听于2222端口的http服务容器
+docker run --name t1 -it --rm busybox
+/ # ifconfig
+
+# 创建一个联盟式容器(--network指定使用t1的网络名称空间) 并查看其监听的端口
+docker run --name t2 -it --rm --network container:t1 busybox
+/ # ifconfig
+```
+
+#### Open Container
+
+```bash
+# --network 指定 host
+# 直接使用宿主机的网络名称空间 无需再Expose端口
+docker run --rm -it --network host busybox
+```
+
+#### Closed Container
+
+```bash
+docker run --rm -it --network none busybox
+```
+
+#### 自定义docker0桥的网络信息
+
+```json
+// 编辑 /etc/docker/daemon.json 配置文件
+
+{
+    "bip": "192.168.1.5/24",
+    "fixed-cidr": "10.20.0.0/16",
+    "fixed-cidr-v6": "2001:db8::/64",
+    "mtu": "1500",
+    "default-gateway": "10.20.1.1",
+    "default-gateway-v6": "2001:db8:abcd::89",
+    "dns": ["10.20.1.2","10.20.1.3"]
+}
+
+// 核心选项为bip 即bridge ip之意 
+// 用于指定docker0桥自身的IP地址 其他选项可以通过此地址计算得出
+```
+
+#### 使用TCP套接字
+
+```json
+// dockerd守护进程的C/S 其默认仅监听Unix Socket格式的地址 /var/run/docker.sock
+// 如果使用TCP套接字 需要修改 /etc/docekr/daemon.json 配置文件
+// 也可向dockerd直接传递 "-H|--host"选项
+
+{
+    "hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]
+}
+```
+
+```bash
+# dockerd使用TCP监听0.0.0.0:2375之后 客户端可以远程执行CLI
+docker -H x.x.x.x:2375 image ls
+docker -H x.x.x.x:2375 ps -a
+```
+
+#### 创建自定义网络
+
+```bash
+# 创建自定义网络
+docker network create -d bridge --subnet "172.26.0.0/16" --gateway "172.26.0.1" mybr0
+
+# 使用自定义网络
+[root@master ~]# docker run -it --rm --name t1 --network mybr0 busybox
+/ # ifconfig
+eth0      Link encap:Ethernet  HWaddr 02:42:AC:1A:00:02  
+          inet addr:172.26.0.2  Bcast:172.26.255.255  Mask:255.255.0.0
+```
