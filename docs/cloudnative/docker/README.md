@@ -92,7 +92,7 @@ cgroups为每种可以控制的资源定义了一个子系统 典型的子系统
 
 ### 容器编排
 
-- machine + swarm + composer
+- machine + swarm + docker compose(单机编排)
 - mesos + marathon
 - kubernetes(k8s)
 
@@ -397,9 +397,9 @@ docker run --rm --dns 172.16.0.1 --add-host "docker.com:172.16.0.100" busybox:la
 Expose端口 还可以参考 -P 选项：暴露容器内部已指定的端口
 ```
 
-#### Joined Containers
+#### Joined Container
 
-- 联盟式容器是指使用某个已存在容器的网络接口的容器 接口被联盟内的各容器共享使用
+- 联盟式容器是指使用某个已存在容器的网络接口的容器 接口被联盟内的各容器共享使用(NTS Network IPC)
 - 联盟式容器彼此间虽然共享同一个网络名称空间 但其它内部名称空间如: User/Mount等还是隔离的
 - 联盟式容器彼此间存在端口冲突的可能性 使用此种模式的网络模型情况
   - 多个容器上的程序需要程序loopback接口互相通信
@@ -511,3 +511,49 @@ Docker镜像由多个"只读层"叠加而成
   - 卷实现了**程序(镜像)** 和 **数据(卷)** 分离 以及 **程序(镜像)** 和 **制作镜像的主机** 分离; 用户制作镜像时无需再考虑镜像运行的容器所在的主机的环境
 
 ![volume2](./icons/volume2.png)
+
+#### Data volumes
+
+```bash
+Docekr有两种类型的卷 每种类型都在容器中存在一个挂载点 但在其宿主机上的位置有所不同
+```
+
+- Bind mount volume(绑定挂在卷)
+  - a volume that points to a user-specified location on the host file system
+- Docker-managed volume(Docker管理卷)
+  - the Docker daemon creates managed volumes in a portion of the host's file system that's owned by Docker
+
+![data-volume](./icons/data-volumes.png)
+
+```bash
+# 在容器中使用Volumes
+# 为docker run命令使用-v选项即可使用Volume
+
+# Docker-managed volume
+docker run -it --name t1 -v /data busybox
+docker inspect -f {{.Mounts}} t1
+
+# Bind-mount Volume
+docker run -it -v HOSTDIR:VOLUMEDIR --name t2 bustbox
+docker inspect -f {{.Mount}} t2
+```
+
+#### Sharing volumes
+
+```bash
+# There are tow ways to share volumes between containers
+
+# 多个容器的卷使用同一个主机目录
+docker run -it --name t1 -v /docker/volumes/v1:/data busybox
+docker run -it --name t2 -v /docker/volumes/v1:/data busybox
+
+# 复制使用其他容器的卷 为docker run命令使用 --volumes-from 选项
+docker run -it --name t3 -v /docker/volumes/v1:/data busybox
+docker run -it --name t4 --volumes-from t3 busybox
+
+# 如果有多个容器需要共享网络名称空间(UTS Network IPC) 以及需要共享存储卷
+# 可以 事先创建一个 基础容器 其他的容器都加入该容器的网络名称空间(Joined Container) 并且复制该容器使用的卷(--volumes-from)
+docker run --name infracon -it -v /data/infracon/volume:/data busybox
+docker run --name nginx --network container:infracon --volumes-from infracon -it nginx
+docker run ... --network container:infracon --volumes-from infracon ...
+```
