@@ -198,7 +198,7 @@ gpgkey=https://download.docker.com/linux/centos/gpg
 - [阿里云官方镜像加速](https://help.aliyun.com/document_detail/60750.html)
 - 中国科技大学
 
-```json
+```bash
 # 配置文件
 /etc/docker/daemon.json
 
