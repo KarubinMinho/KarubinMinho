@@ -431,8 +431,8 @@ docker run --rm -it --network none busybox
 
 #### 自定义docker0桥的网络信息
 
-```json
-// 编辑 /etc/docker/daemon.json 配置文件
+```bash
+# 编辑 /etc/docker/daemon.json 配置文件
 
 {
     "bip": "192.168.1.5/24",
@@ -444,16 +444,16 @@ docker run --rm -it --network none busybox
     "dns": ["10.20.1.2","10.20.1.3"]
 }
 
-// 核心选项为bip 即bridge ip之意 
-// 用于指定docker0桥自身的IP地址 其他选项可以通过此地址计算得出
+# 核心选项为bip 即bridge ip之意 
+# 用于指定docker0桥自身的IP地址 其他选项可以通过此地址计算得出
 ```
 
 #### 使用TCP套接字
 
-```json
-// dockerd守护进程的C/S 其默认仅监听Unix Socket格式的地址 /var/run/docker.sock
-// 如果使用TCP套接字 需要修改 /etc/docekr/daemon.json 配置文件
-// 也可向dockerd直接传递 "-H|--host"选项
+```bash
+# dockerd守护进程的C/S 其默认仅监听Unix Socket格式的地址 /var/run/docker.sock
+# 如果使用TCP套接字 需要修改 /etc/docekr/daemon.json 配置文件
+# 也可向dockerd直接传递 "-H|--host"选项
 
 {
     "hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]
