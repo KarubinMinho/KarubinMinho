@@ -481,7 +481,7 @@ eth0      Link encap:Ethernet  HWaddr 02:42:AC:1A:00:02
 
 ### docker存储卷
 
-#### Why Data Volumes(存储卷)?
+#### Why Data Volumes(存储卷)
 
 ```bash
 Docker镜像由多个"只读层"叠加而成 
