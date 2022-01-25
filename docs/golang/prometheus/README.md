@@ -22,24 +22,24 @@ ln -sv prometheus-${VERSION}.linux-amd64/ prometheus
 curl -s https://packagecloud.io/install/repositories/prometheus-rpm/release/script.rpm.sh | sudo bash
 ```
 
-
 ## 基础认证
 
 [BasicAuth参考](https://prometheus.io/docs/guides/basic-auth/)
 
 ```bash
 # Web Basic
-	user:password
-	
+ user:password
+ 
 # Prometheus scrape:
-	- Web Basic
-	- Token方法
+ - Web Basic
+ - Token方法
 
-	Authorization: Token
-		- web basic: Basic[空格]base64(user:password)
-		- bearer token: Bearer[空格]Token
-			格式： token jwttoken(如果有失效日期 需要同步配置文件)
+ Authorization: Token
+  - web basic: Basic[空格]base64(user:password)
+  - bearer token: Bearer[空格]Token
+   格式： token jwttoken(如果有失效日期 需要同步配置文件)
 ```
+
 ## 配置文件
 
 ```yaml
@@ -146,159 +146,159 @@ systemctl restart node_exporter
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
-	"fmt"
-	"math/rand"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
+ "bytes"
+ "encoding/base64"
+ "fmt"
+ "math/rand"
+ "net/http"
+ "strconv"
+ "strings"
+ "time"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+ "github.com/prometheus/client_golang/prometheus"
+ "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type MemPercentCollector struct {
-	desc *prometheus.Desc
+ desc *prometheus.Desc
 }
 
 func NewMemPercentCollector() *MemPercentCollector {
-	return &MemPercentCollector{
-		prometheus.NewDesc("mem_percent", "Mem Percent", nil, nil),
-	}
+ return &MemPercentCollector{
+  prometheus.NewDesc("mem_percent", "Mem Percent", nil, nil),
+ }
 }
 
 func (c *MemPercentCollector) Describe(ch chan<- *prometheus.Desc) {
-	ch <- c.desc
+ ch <- c.desc
 }
 
 func (c *MemPercentCollector) Collect(ch chan<- prometheus.Metric) {
-	// 四种类型返回值
-	fmt.Println("Mem Percent")
-	ch <- prometheus.MustNewConstMetric(c.desc, prometheus.GaugeValue, rand.Float64()*100)
+ // 四种类型返回值
+ fmt.Println("Mem Percent")
+ ch <- prometheus.MustNewConstMetric(c.desc, prometheus.GaugeValue, rand.Float64()*100)
 }
 
 var (
-	requestTotal = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace:   "dev",
-		Subsystem:   "web",
-		Name:        "http_request_total",
-		Help:        "web server http request total",
-		ConstLabels: map[string]string{"env": "dev"},
-	})
+ requestTotal = prometheus.NewCounter(prometheus.CounterOpts{
+  Namespace:   "dev",
+  Subsystem:   "web",
+  Name:        "http_request_total",
+  Help:        "web server http request total",
+  ConstLabels: map[string]string{"env": "dev"},
+ })
 
-	syncTaskTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "sync_task_total",
-		Help: "Sycn data tasl total",
-	}, []string{"type"})
+ syncTaskTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+  Name: "sync_task_total",
+  Help: "Sycn data tasl total",
+ }, []string{"type"})
 
-	// 访问/metrics触发
-	currentTime = prometheus.NewCounterFunc(prometheus.CounterOpts{
-		Name: "web_server_current_time",
-		Help: "Web Server Current Time",
-	}, func() float64 {
-		fmt.Println("current time")
-		return float64(time.Now().Unix())
-	})
+ // 访问/metrics触发
+ currentTime = prometheus.NewCounterFunc(prometheus.CounterOpts{
+  Name: "web_server_current_time",
+  Help: "Web Server Current Time",
+ }, func() float64 {
+  fmt.Println("current time")
+  return float64(time.Now().Unix())
+ })
 
-	// GaugeVec
-	cpuPercent = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "web_server_cpu_percent",
-		Help: "Web Server CPU Percent",
-	}, []string{"cpu"})
+ // GaugeVec
+ cpuPercent = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+  Name: "web_server_cpu_percent",
+  Help: "Web Server CPU Percent",
+ }, []string{"cpu"})
 
-	delayHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "web_process_delay",
-		Help:    "Web Process Dealy",
-		Buckets: prometheus.LinearBuckets(2, 2, 5),
-	}, []string{"path"})
+ delayHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+  Name:    "web_process_delay",
+  Help:    "Web Process Dealy",
+  Buckets: prometheus.LinearBuckets(2, 2, 5),
+ }, []string{"path"})
 
-	delaySummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name:       "web_process_delay_summary",
-		Help:       "Web Process Delay Summary",
-		Objectives: map[float64]float64{0.6: 0.05, 0.8: 0.02, 0.9: 0.01, 0.95: 0.005, 1: 0.001},
-	}, []string{"path"})
+ delaySummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+  Name:       "web_process_delay_summary",
+  Help:       "Web Process Delay Summary",
+  Objectives: map[float64]float64{0.6: 0.05, 0.8: 0.02, 0.9: 0.01, 0.95: 0.005, 1: 0.001},
+ }, []string{"path"})
 )
 
 // 事件触发 每次访问 / 的时候+1
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	delay := float64(rand.Intn(20))
-	delayHistogram.WithLabelValues(r.URL.Path).Observe(delay)
-	delaySummary.WithLabelValues(r.URL.Path).Observe(delay)
-	rand.Intn(20)
-	fmt.Println("IndexHandler")
-	requestTotal.Inc()
-	fmt.Fprintf(w, "%d", time.Now().Unix())
+ delay := float64(rand.Intn(20))
+ delayHistogram.WithLabelValues(r.URL.Path).Observe(delay)
+ delaySummary.WithLabelValues(r.URL.Path).Observe(delay)
+ rand.Intn(20)
+ fmt.Println("IndexHandler")
+ requestTotal.Inc()
+ fmt.Fprintf(w, "%d", time.Now().Unix())
 }
 
 func Auth(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// 检查前
-		authorization := r.Header.Get("Authorization")
-		prefix := "Basic "
-		// if strings.HasPrefix(authorization, prefix) {
-		// 	authorization = authorization[len(prefix):]
-		// }
-		authorization = strings.TrimPrefix(authorization, prefix)
-		txt, err := base64.StdEncoding.DecodeString(authorization)
-		if err != nil || !bytes.Equal(txt, []byte("minho:123")) {
-			// 认证失败
-			w.Header().Add("www-authenticate", "Basic")
-			w.WriteHeader(401)
-			return
-		}
+ return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+  // 检查前
+  authorization := r.Header.Get("Authorization")
+  prefix := "Basic "
+  // if strings.HasPrefix(authorization, prefix) {
+  //  authorization = authorization[len(prefix):]
+  // }
+  authorization = strings.TrimPrefix(authorization, prefix)
+  txt, err := base64.StdEncoding.DecodeString(authorization)
+  if err != nil || !bytes.Equal(txt, []byte("minho:123")) {
+   // 认证失败
+   w.Header().Add("www-authenticate", "Basic")
+   w.WriteHeader(401)
+   return
+  }
 
-		handler.ServeHTTP(w, r)
-		// 检查后
-	})
+  handler.ServeHTTP(w, r)
+  // 检查后
+ })
 }
 
 func main() {
-	rand.Seed(time.Now().Unix())
+ rand.Seed(time.Now().Unix())
 
-	// 同步任务1 周期性触发
-	go func() {
-		for range time.Tick(time.Second * 10) {
-			fmt.Println("task1")
-			syncTaskTotal.WithLabelValues("task1").Inc()
-		}
-	}()
-	// 同步任务2 周期性触发
-	go func() {
-		for range time.Tick(time.Second * 3) {
-			fmt.Println("task2")
-			syncTaskTotal.WithLabelValues("task2").Inc()
-		}
-	}()
+ // 同步任务1 周期性触发
+ go func() {
+  for range time.Tick(time.Second * 10) {
+   fmt.Println("task1")
+   syncTaskTotal.WithLabelValues("task1").Inc()
+  }
+ }()
+ // 同步任务2 周期性触发
+ go func() {
+  for range time.Tick(time.Second * 3) {
+   fmt.Println("task2")
+   syncTaskTotal.WithLabelValues("task2").Inc()
+  }
+ }()
 
-	go func() {
-		for range time.Tick(time.Second * 10) {
-			for i := 0; i < 4; i++ {
-				fmt.Println("cpu percent", i)
-				cpuPercent.WithLabelValues(strconv.Itoa(i)).Set(rand.Float64() * 100)
-			}
-		}
-	}()
+ go func() {
+  for range time.Tick(time.Second * 10) {
+   for i := 0; i < 4; i++ {
+    fmt.Println("cpu percent", i)
+    cpuPercent.WithLabelValues(strconv.Itoa(i)).Set(rand.Float64() * 100)
+   }
+  }
+ }()
 
-	// 1. 定义指标
-	// 2. 注册指标
-	prometheus.MustRegister(requestTotal)
-	prometheus.MustRegister(syncTaskTotal)
-	prometheus.MustRegister(currentTime)
-	prometheus.MustRegister(cpuPercent)
-	prometheus.MustRegister(delayHistogram)
-	prometheus.MustRegister(delaySummary)
-	prometheus.MustRegister(NewMemPercentCollector())
-	// 3. 注册处理器
-	// 4. 启动web服务
-	// 5. 更新指标信息
-	// fmt.Println(prometheus.LinearBuckets(2, 2, 5))
+ // 1. 定义指标
+ // 2. 注册指标
+ prometheus.MustRegister(requestTotal)
+ prometheus.MustRegister(syncTaskTotal)
+ prometheus.MustRegister(currentTime)
+ prometheus.MustRegister(cpuPercent)
+ prometheus.MustRegister(delayHistogram)
+ prometheus.MustRegister(delaySummary)
+ prometheus.MustRegister(NewMemPercentCollector())
+ // 3. 注册处理器
+ // 4. 启动web服务
+ // 5. 更新指标信息
+ // fmt.Println(prometheus.LinearBuckets(2, 2, 5))
 
-	addr := ":9999"
-	http.Handle("/", Auth(http.HandlerFunc(IndexHandler)))
-	http.Handle("/metrics/", Auth(promhttp.Handler()))
-	http.ListenAndServe(addr, nil)
+ addr := ":9999"
+ http.Handle("/", Auth(http.HandlerFunc(IndexHandler)))
+ http.Handle("/metrics/", Auth(promhttp.Handler()))
+ http.ListenAndServe(addr, nil)
 }
 ```
 
@@ -325,59 +325,59 @@ Filter After
 package filters
 
 import (
-	"strconv"
-	"time"
+ "strconv"
+ "time"
 
-	"github.com/beego/beego/v2/server/web/context"
+ "github.com/beego/beego/v2/server/web/context"
 
-	"github.com/prometheus/client_golang/prometheus"
+ "github.com/prometheus/client_golang/prometheus"
 )
 
 var (
-	totalRequest = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "cmdb_request_total",
-		Help: "cmdb request total",
-	})
+ totalRequest = prometheus.NewCounter(prometheus.CounterOpts{
+  Name: "cmdb_request_total",
+  Help: "cmdb request total",
+ })
 
-	urlRequest = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "cmdb_request_url_total",
-		Help: "cmdb request url total",
-	}, []string{"url"})
+ urlRequest = prometheus.NewCounterVec(prometheus.CounterOpts{
+  Name: "cmdb_request_url_total",
+  Help: "cmdb request url total",
+ }, []string{"url"})
 
-	statusCode = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "cmdb_status_code",
-		Help: "cmdb status code",
-	}, []string{"status_code"})
+ statusCode = prometheus.NewCounterVec(prometheus.CounterOpts{
+  Name: "cmdb_status_code",
+  Help: "cmdb status code",
+ }, []string{"status_code"})
 
-	elapsedTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "cmdb_url_elapsed_time",
-		Help:    "cmdb url elapsed time",
-		Buckets: prometheus.LinearBuckets(1, 5, 1),
-	}, []string{"url"})
+ elapsedTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+  Name:    "cmdb_url_elapsed_time",
+  Help:    "cmdb url elapsed time",
+  Buckets: prometheus.LinearBuckets(1, 5, 1),
+ }, []string{"url"})
 )
 
 func init() {
-	prometheus.MustRegister(totalRequest)
-	prometheus.MustRegister(urlRequest)
-	prometheus.MustRegister(statusCode)
-	prometheus.MustRegister(elapsedTime)
+ prometheus.MustRegister(totalRequest)
+ prometheus.MustRegister(urlRequest)
+ prometheus.MustRegister(statusCode)
+ prometheus.MustRegister(elapsedTime)
 }
 
 func BeforeExec(ctx *context.Context) {
-	totalRequest.Inc()
-	urlRequest.WithLabelValues(ctx.Input.URL()).Inc()
-	ctx.Input.SetData("stime", time.Now().Unix())
+ totalRequest.Inc()
+ urlRequest.WithLabelValues(ctx.Input.URL()).Inc()
+ ctx.Input.SetData("stime", time.Now().Unix())
 }
 
 func AfterExec(ctx *context.Context) {
-	statusCode.WithLabelValues(strconv.Itoa(ctx.ResponseWriter.Status)).Inc()
-	stime := ctx.Input.GetData("stime")
-	if stime != nil {
-		if st, ok := stime.(int64); ok {
-			elapsed := time.Now().Unix() - st
-			elapsedTime.WithLabelValues(ctx.Input.URL()).Observe(float64(elapsed))
-		}
-	}
+ statusCode.WithLabelValues(strconv.Itoa(ctx.ResponseWriter.Status)).Inc()
+ stime := ctx.Input.GetData("stime")
+ if stime != nil {
+  if st, ok := stime.(int64); ok {
+   elapsed := time.Now().Unix() - st
+   elapsedTime.WithLabelValues(ctx.Input.URL()).Observe(float64(elapsed))
+  }
+ }
 }
 ```
 
@@ -655,29 +655,29 @@ sum(rate(node_network_receive_bytes_total{device="eth0"}[5m]) * 8 * on(instance)
 >
 > promagentd:
 >
-> ​	API：
+> ​ API：
 >
-> ​		注册
+> ​  注册
 >
-> ​		心跳
+> ​  心跳
 >
-> ​		配置获取
+> ​  配置获取
 >
-> ​	Agentd:
+> ​ Agentd:
 >
-> ​		注册： 周期性 1h
+> ​  注册： 周期性 1h
 >
-> ​		心跳： 周期性 1m
+> ​  心跳： 周期性 1m
 >
-> ​		获取配置： 周期性 15m(会有延迟)
+> ​  获取配置： 周期性 15m(会有延迟)
 >
 > Q: 如何减少获取配置延迟？
 >
 > A: 间隔缩短至1min 但是这个时候配置不一定改变 需要检测配置是否变化 不变化则不用更新  定义：version/update_at字段 比较复杂的可以实现在心跳接口 发生变更再调用获取配置接口更新配置
 >
-> ​		更新prometheus.yml
+> ​  更新prometheus.yml
 >
-> ​		kill -HUP $(pidof prometheus)
+> ​  kill -HUP $(pidof prometheus)
 
 ## logrus日志库
 
@@ -687,40 +687,40 @@ sum(rate(node_network_receive_bytes_total{device="eth0"}[5m]) * 8 * on(instance)
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/natefinch/lumberjack.v2"
+ log "github.com/sirupsen/logrus"
+ "gopkg.in/natefinch/lumberjack.v2"
 )
 
 func main() {
-	// handler, err := os.Create("logs/run.log")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	handler := &lumberjack.Logger{
-		Filename:   "logs/run.log",
-		MaxSize:    1, // Megabytes
-		MaxBackups: 7,
-		LocalTime:  true,
-		Compress:   true,
-	}
-	defer handler.Close()
+ // handler, err := os.Create("logs/run.log")
+ // if err != nil {
+ //  log.Fatal(err)
+ // }
+ handler := &lumberjack.Logger{
+  Filename:   "logs/run.log",
+  MaxSize:    1, // Megabytes
+  MaxBackups: 7,
+  LocalTime:  true,
+  Compress:   true,
+ }
+ defer handler.Close()
 
-	log.SetLevel(log.DebugLevel) // 默认info级别
-	log.SetFormatter(&log.TextFormatter{})
-	// log.SetFormatter(&log.JSONFormatter{}) // json格式
+ log.SetLevel(log.DebugLevel) // 默认info级别
+ log.SetFormatter(&log.TextFormatter{})
+ // log.SetFormatter(&log.JSONFormatter{}) // json格式
 
-	log.SetReportCaller(true) // 打印在哪个文件 哪一行输出的日志消息
-	log.SetOutput(handler)
+ log.SetReportCaller(true) // 打印在哪个文件 哪一行输出的日志消息
+ log.SetOutput(handler)
 
-	for i := 0; i <= 10000; i++ {
-		log.WithFields(log.Fields{
-			"test":  "1",
-			"test2": 2,
-		}).Error("error")
-		log.Warn("warning")
-		log.Info("info")
-		log.Debug("debug")
-	}
+ for i := 0; i <= 10000; i++ {
+  log.WithFields(log.Fields{
+   "test":  "1",
+   "test2": 2,
+  }).Error("error")
+  log.Warn("warning")
+  log.Info("info")
+  log.Debug("debug")
+ }
 }
 ```
 
@@ -752,77 +752,77 @@ mysql:
 package main
 
 import (
-	"fmt"
-	"log"
+ "fmt"
+ "log"
 
-	"github.com/spf13/viper"
+ "github.com/spf13/viper"
 )
 
 type webConfig struct {
-	Addr string
-	Auth struct {
-		User     string
-		Password string
-	}
+ Addr string
+ Auth struct {
+  User     string
+  Password string
+ }
 }
 
 type mysqlConfig struct {
-	// 标签指定字段映射
-	Addr string `mapstructure:"host"`
-	Port int
+ // 标签指定字段映射
+ Addr string `mapstructure:"host"`
+ Port int
 }
 
 type Config struct {
-	Web   webConfig
-	MySQL mysqlConfig
+ Web   webConfig
+ MySQL mysqlConfig
 }
 
 func main() {
-	// 开启功能：从环境变量读取配置
-	// 优先级：环境变量 > 配置文件 > 默认值
-	viper.AutomaticEnv()
-	// 设置环境变量以 prefix_ 开头才能读取到配置
-	viper.SetEnvPrefix("testviper") // testviper_web.addr
+ // 开启功能：从环境变量读取配置
+ // 优先级：环境变量 > 配置文件 > 默认值
+ viper.AutomaticEnv()
+ // 设置环境变量以 prefix_ 开头才能读取到配置
+ viper.SetEnvPrefix("testviper") // testviper_web.addr
 
-	// 设置默认值
-	// 没有配置文件 或者 配置文件没有配置相关的值 => 使用默认值
-	viper.SetDefault("web.addr", ":10000")
-	viper.SetDefault("mysql.host", "127.0.0.1")
-	viper.SetDefault("mysql.port", 3306)
-	viper.SetDefault("mysql.user", "root")
-	viper.SetDefault("mysql.password", "")
+ // 设置默认值
+ // 没有配置文件 或者 配置文件没有配置相关的值 => 使用默认值
+ viper.SetDefault("web.addr", ":10000")
+ viper.SetDefault("mysql.host", "127.0.0.1")
+ viper.SetDefault("mysql.port", 3306)
+ viper.SetDefault("mysql.user", "root")
+ viper.SetDefault("mysql.password", "")
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+ viper.SetConfigName("config")
+ viper.SetConfigType("yaml")
 
-	// 增加多个查找目录 
-	viper.AddConfigPath("./etc/")
-	viper.AddConfigPath(".")
+ // 增加多个查找目录 
+ viper.AddConfigPath("./etc/")
+ viper.AddConfigPath(".")
     // 如何固定一个配置文件
     // viper.SetConfigFile(xx.yml)
 
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Println("config not found, use default")
-		} else {
-			log.Fatal(err)
-		}
-	}
+ if err := viper.ReadInConfig(); err != nil {
+  if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+   log.Println("config not found, use default")
+  } else {
+   log.Fatal(err)
+  }
+ }
 
-	fmt.Println(viper.GetString("web.addr"))
-	fmt.Println(viper.GetString("web.auth.user"))
-	fmt.Println(viper.GetString("web.auth.password"))
-	fmt.Println(viper.GetString("mysql.host"))
-	fmt.Println(viper.GetString("mysql.port"))
+ fmt.Println(viper.GetString("web.addr"))
+ fmt.Println(viper.GetString("web.auth.user"))
+ fmt.Println(viper.GetString("web.auth.password"))
+ fmt.Println(viper.GetString("mysql.host"))
+ fmt.Println(viper.GetString("mysql.port"))
 
-	fmt.Println("=========")
+ fmt.Println("=========")
 
-	var config Config
-	err := viper.Unmarshal(&config)
-	fmt.Println(err)
-	fmt.Printf("%#v\n", config)
-	fmt.Println(config.MySQL.Addr)
-	fmt.Println(config.MySQL.Port)
+ var config Config
+ err := viper.Unmarshal(&config)
+ fmt.Println(err)
+ fmt.Printf("%#v\n", config)
+ fmt.Println(config.MySQL.Addr)
+ fmt.Println(config.MySQL.Port)
 }
 ```
 
@@ -834,37 +834,41 @@ func main() {
 package main
 
 import (
-	"crypto/tls"
-	"fmt"
-	"net/http"
+ "crypto/tls"
+ "fmt"
+ "net/http"
 
-	"github.com/imroc/req"
+ "github.com/imroc/req"
 )
 
 func main() {
-	req.Debug = true
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		},
-	}
+ req.Debug = true
+ client := &http.Client{
+  Transport: &http.Transport{
+   TLSClientConfig: &tls.Config{
+    InsecureSkipVerify: true,
+   },
+  },
+ }
 
-	request := req.New()
-	// 心跳
-	// {uuid: "xx"}
-	response, err := request.Post("https://localhost:8888/v1/agent/heartbeat", req.Param{
-		"uuid": "xxxx",
-	}, req.Header{"x-token": "820923a1a2dad74e8d279c48b8a1160c"}, client)
+ request := req.New()
+ // 心跳
+ // {uuid: "xx"}
+ response, err := request.Post("https://localhost:8888/v1/agent/heartbeat", req.Param{
+  "uuid": "xxxx",
+ }, req.Header{"x-token": "820923a1a2dad74e8d279c48b8a1160c"}, client)
 
-	if err == nil {
-		rt := make(map[string]interface{})
-		response.ToJSON(&rt)
-		fmt.Println(rt)
-	}
+ if err == nil {
+  rt := make(map[string]interface{})
+  response.ToJSON(&rt)
+  fmt.Println(rt)
+ }
 }
 ```
 
 ## cobra子命令
 
+
+# Alertmanager
+
+[alertmanager](https://prometheus.io/docs/alerting/)
