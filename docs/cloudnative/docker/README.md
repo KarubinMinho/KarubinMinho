@@ -561,4 +561,163 @@ docker run --name nginx --network container:infracon --volumes-from infracon -it
 docker run ... --network container:infracon --volumes-from infracon ...
 ```
 
-### Dockerfile
+## Dockerfile
+
+[Dockerfile-reference](https://docs.docker.com/engine/reference/builder/)
+
+Dockerfile is nothing but the source code for building Docker images
+
+- Docker can build images automatically by reading the instructions from a Dockerfile
+- A Dockerfile is a `text document` than contains all the commands a user could call on the command line to assemble an image
+- Using `docker build` users can create an automated build that executes several command-line instructions in succession
+
+![build](./icons/docker-build.png)
+
+### Dockerfile Format
+
+- Format
+  - \# Comment (注释)
+  - INSTRUCTION arguments (指令及其参数 通常一行一个执行 太长使用`\`换行)
+- The instruction is not case-sensitive (指令大小写不敏感)
+  - However, convention is for them to be UPPERCASE to distinguish them from arguments more easily (一般约定使用大写 和参数区分开)
+- Docker runs instructions in a Dockerfile in order (顺序执行)
+- The first instruction must be `FROM` in order to specify the Base Image from which you are building (第一个非指数行 必须为`FROM`指令)
+
+### .dockerignore file
+
+- Before the docker CLI sends the context to the docker daemon, it looks for a file named .dockerignore in the root directory of the context
+- If this file exists, the CLI modifies the context to exclude files and directories than match patterns in it
+- The CLI interprets the .dockerignore file as a newline-separated list of patterns similar to the file globs of Unix shells
+
+### Environment replacement
+
+- Environment variables (declared with the `ENV` statement) can also be used in certain instructions as variables to be interpred by the Dockerfile
+- Environment variables are notated in the Dockerfile either with $variable_name or ${variable_name}
+- The ${variable_name} syntax also supports a few of the standard bash modifiers
+  - ${variable:-word} - 设置默认值 variable未设置或为空 则变量默认值为: word
+  - ${variable:+word} - 和 ${variable:-word} 相反
+
+### Docekrfile Instructions
+
+#### FROM
+
+- `FROM`指令是最重要的一个且必须为Docekrfile文件开篇的第一个非注释行 用于为镜像文件构建过程指定基准镜像 后续的指令运行于此基准镜像所提供的运行环境
+- 实践中 基准镜像可以是任何可用镜像文件 默认情况下 `docekr build`会在docker主机上查找指定的镜像文件 在其不存在时 则会从Docker Hub Registry上拉取所需的镜像文件
+  - 如果找不到执行的镜像文件 `docker build`会返回一个错误信息
+- Syntax
+  - `FROM <repository>[:<tag>]` 或
+  - `FROM <repository>@<digest>` @符号指定hash码 确保base image不会被篡改
+    - `<repository>` 指定作为 base image 的名称
+    - `<tag>` base image 的标签 可选 省略时默认为latest
+
+#### MAINTANIER(deprecated)
+
+- 用于让Docekrfile制作者提供本人的详细信息
+- Dockerfile并不限制MAINTANIER指令出现的位置 但推荐将其放置于`FROM`指令后
+- Syntax
+  - `MAINTANIER <author's detail>`
+    - `<author's detail>`可以是任何文本信息 但约定俗成地使用作者名称及其邮件地址
+    - `MAINTANIER "ilolicon <97431110@qq.com>"`
+
+#### LABEL
+
+The LABEL instruction adds metadata to an image (可替换MAINTANIER 并可添加更多元数据信息)
+
+- Syntax: `LABEL <key>=<value> <key>=<value> <key>=<value> ...`
+- The LABEL instruction adds metadata to an image
+- A LABEL is a key-value pair
+- To include spaces within a LABEL value, use quotes and backslashes as you would in command-line parsing
+- An image can have more than one label
+- You can specify multiple labels on a single line
+
+#### COPY
+
+- 用于从Docker主机复制文件至创建的新镜像文件
+- Syntax
+  - `COPY <src> ... <dest>` 或
+  - `COPY ["<src>", ..., "<dest>"]`
+    - `<src>` 要复制的源文件或目录 支持使用通配符
+    - `<dest>` 目标路径 即正在创建的image的文件系统路径 建议`<dest>`使用绝对路径 否则`COPY`指令则以WORKDIR为其起始路径
+  - 注意: 在路径中有空白符时 通常使用第二种格式
+- 文件复制准则
+  - `<src>`必须是build上下文中的路径 不能是其父目录中的文件
+  - 如果`<src>`是目录 则其内部文件或子目录会被递归复制 但是`<src>`目录本身不会被复制
+  - 如果指定多个`<src>` 或在`<src>`中使用了通配符 则`<dest>`必须是一个目录 且必须以`/`结尾
+  - 如果`<dest>`事先不存在 它将会被自动创建 这包括其父级目录
+
+#### ADD
+
+- `ADD`指令类似于`COPY`指令 ADD支持使用TAR文件和URL路径
+- Syntax
+  - `ADD <src> ... <dest>` 或
+  - `ADD ["<src>", ..., "<dest>"]`
+- 操作准则
+  - 同`COPY`指令
+  - URL
+    - 如果`<src>`为URL且`<dest>`不以`/`结尾 则`<src>`指定的文件将被下载并直接被创建为`<dest>`
+    - 如果`<src>`为URL且`<dest>`以`/`结尾 则文件名URL指定的文件将被下载并保存为`<dest>/<filename>`
+  - TAR
+    - 如果`<src>`是一个本地系统上的压缩格式的tar文件 它将被展开为一个目录 其行为类似于`tar -x`命令 然而 通道URL获取到的tar文件将不会自动展开
+  - 如果`<src>`有多个 或其间接或直接使用了通配符 则`<dest>`必须是一个以`/`结尾的目录路径 如果`<dest>`不以`/`结尾 则其将被视为一个普通文件 `<src>`的内容将被直接写入到`<dest>`
+
+#### WORKDIR
+
+- 用于为Dockerfile中所有的`RUN/CMD/ENTRYPOINT/COPY/ADD`指令设置工作目录
+- Syntax
+  - `WORKDIR <dirpath>`
+    - 在Dockerfile中 `WORKDIR`指令可以出现多次 其路径也可以为相对路径 不过其是相对此前一个`WODKDIR`指令指定的路径
+    - 另外 `WORKDIR`也可调用由`ENV`指令定义的变量
+  - e.g
+    - `WORKDIR /var/log`
+    - `WORKDIR $STATEPATH`
+
+#### VOLUME
+
+- 用于在image中创建一个挂载点目录 以挂载Docker host上的卷或其他容器上的卷
+- Syntax
+  - `VOLUME <mountpoint>` 或
+  - `VOLUME ["<mountpoint>"]`
+- 如果挂载点目录路径下此前在文件存在 `docker run`命令会在挂载完成后将此前的所有文件复制到新挂载的卷中
+
+#### EXPOSE
+
+- 用于为容器打开指定要监听的端口 以实现与外部通信
+- Syntax
+  - `EXPOSE <port>[/<protocol>] [<port>[/protocol]...]`
+    - `<protocol>`用于指定传输层协议 可为tcp或udp二者之一 默认为TCP协议
+  - `EXPOSE`指令可一次指定多个端口
+    - `EXPOSE 11211/udp 11211/tcp`
+
+#### ENV
+
+- 用于为镜像定义所需的环境变量 并可被Dockerfile文件中位与其后的其它指令(如`ENV/ADD/COPY`等)所调用
+- 调用格式为 $variable_name 或 ${variable_name}
+- Syntax
+  - `ENV <key> <value>` 或
+  - `ENV <key>=<value> ...`
+- 第一种格式中: `<key>`之后的所有内容均会被视作其`<value>`的组成部分 因此 一次只能设置一个变量
+- 第二种格式中: 可以一次设置多个变量 每个变量为一个`<key>=<value>`的键值对 如果`<value>`中包含空格 可以以反斜线`\`进行转义 也可以通过对`<value>`加引号进行标识 另外 反斜线也用于续行
+- 定义多个变量时 建议使用第二种方式 以便在同一层中完成所有功能
+
+#### RUN
+
+- 用于指定`docker build`过程中运行的程序 其可以是任何命令(基于base image提供)
+- Syntax
+  - `RUN <command>` 或
+  - `RUN ["<executable>", "<param1>", "<param2>"]`
+- 第一种格式中 `<command>` 通常是一个shell命令 且以`/bin/sh -c`来运行它 这意味着此进程在容器中的PID不是1 不能接收Unix信号 因此 当使用`docker stop <container>`命令停止容器时 此进程接收不到SIGTERM信号
+- 第二种语法格式中的参数是一个JSON格式的数组 其中`<executable>`为要运行的命令 后面的`<paramN>`为传递给命令的选项或参数 然而 此种格式指定的命令不会以`/bin/sh -c`来发起 因此常见的shell操作如变量替换以及通配符`? *等`替换将不会进行 不过如果要运行的命令依赖于此shell特性的话 可以将其替换为类似下面的格式
+  - `RUN ["/bin/sh", "-c", "<executable>", "<param1>"]`
+
+#### CMD
+
+- 类似于`RUN`指令 `CMD`指令也可用于运行任何命令或应用程序 不过 二者的运行时间点不同
+  - `RUN`指令运行于映像文件构建过程中 而`CMD`指令运行于基于Dockerfile构建出的新映像文件启动一个容器时
+  - `CMD`指令的首要目的在于为启动的容器指定`默认`要运行的程序 且其运行结束后 容器也将终止 不过`CMD`指定的命令可以被`docker run`的命令行选项所覆盖
+  - 在Docekrfile中 可以存在多个`CMD`指令 但仅最后一个会生效
+- Syntax
+  - `CMD <command>` 或
+  - `CMD ["<executable>", "<param1>", "<param2>"]` 或
+  - `CMD ["<param1>", "<param2>"]`
+- 前两种语法格式的意义同`RUN`
+- 都三种则用于为`ENTRYPOINT`指令提供默认参数
