@@ -28,19 +28,16 @@
 
 {{/* Default */}}
 {{ define "default.title" }}{{ template "__subject" . }}{{ end }}
-{{ define "default.content" }}#### **\[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] [{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
+{{ define "default.content" }}### **\[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] [{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
 
 {{ if gt (len .Alerts.Firing) 0 -}} 
-![警报 图标](http://wx4.sinaimg.cn/large/006APoFYly1g0ggpt1aq3j306o06o3yt.jpg)
-
-**=====侦测到故障=====** {{ template "default.__text_alert_list" .Alerts.Firing }} 
-{{- end }}
 ---
+### [WARNING](http://$GRAFANA:$PORT/) ✘ **检测到故障** {{ template "default.__text_alert_list" .Alerts.Firing }} 
+{{- end }}
 
 {{ if gt (len .Alerts.Resolved) 0 -}}
-![警报 图标](https://i01piccdn.sogoucdn.com/2dbf8a9d48e921e7)
-
-**=====故障已修复=====** {{ template "default.__text_alertresolve_list" .Alerts.Resolved }}
+---
+### [FIXED](http://$GRAFANA_IP:$PORT/) ✘ **故障已修复** {{ template "default.__text_alertresolve_list" .Alerts.Resolved }}
 {{- end }}
 {{- end }}
 ---
