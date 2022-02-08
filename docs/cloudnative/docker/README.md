@@ -305,7 +305,7 @@ Docker Hub provides the following major features:
 [quay.io](https://quay.io/)
 
 ```bash
-docker pull <registry>[:port]/[<namespace>/]<name>:<tag>
+$ docker pull <registry>[:port]/[<namespace>/]<name>:<tag>
 
 # e.g:
 # registry: quay.io
@@ -313,7 +313,7 @@ docker pull <registry>[:port]/[<namespace>/]<name>:<tag>
 # namespace: coreos
 # name: flannel(repostory名称)
 # tag: v0.15.1-arm64 指定版本
-docker pull quay.io/coreos/flannel:v0.15.1-arm64
+$ docker pull quay.io/coreos/flannel:v0.15.1-arm64
 ```
 
 | Namespace | Examples(<namespace/name>) |
@@ -371,13 +371,13 @@ NETWORK ID     NAME      DRIVER    SCOPE
 ```bash
 # Bridged Containers可以为docker run命令使用
 # "--hostname HOSTNAME" 选项为容器指定主机名
-docker run --rm --net bridge --hostname cloudnative.ilolicon.com busybox:latest hostname
+$ docker run --rm --net bridge --hostname cloudnative.ilolicon.com busybox:latest hostname
 
 # "--dns DNS_SERVER_IP" 选项能够为容器指定所使用的dns服务器地址
-docker run --rm --dns 8.8.8.8 --dns 8.8.4.4 busybox:latest nslookup docker.com
+$ docker run --rm --dns 8.8.8.8 --dns 8.8.4.4 busybox:latest nslookup docker.com
 
 # "--add-host HOSTNAME:IP" 选项能够为容器指定本地主机名解析项
-docker run --rm --dns 172.16.0.1 --add-host "docker.com:172.16.0.100" busybox:latest cat /etc/hosts
+$ docker run --rm --dns 172.16.0.1 --add-host "docker.com:172.16.0.100" busybox:latest cat /etc/hosts
 ```
 
 ##### Opening Inbound Communication / Expose
@@ -412,11 +412,11 @@ Expose端口 还可以参考 -P 选项：暴露容器内部已指定的端口
 
 ```bash
 # 创建一个监听于2222端口的http服务容器
-docker run --name t1 -it --rm busybox
+$ docker run --name t1 -it --rm busybox
 / # ifconfig
 
 # 创建一个联盟式容器(--network指定使用t1的网络名称空间) 并查看其监听的端口
-docker run --name t2 -it --rm --network container:t1 busybox
+$ docker run --name t2 -it --rm --network container:t1 busybox
 / # ifconfig
 ```
 
@@ -425,13 +425,13 @@ docker run --name t2 -it --rm --network container:t1 busybox
 ```bash
 # --network 指定 host
 # 直接使用宿主机的网络名称空间 无需再Expose端口
-docker run --rm -it --network host busybox
+$ docker run --rm -it --network host busybox
 ```
 
 #### Closed Container
 
 ```bash
-docker run --rm -it --network none busybox
+$ docker run --rm -it --network none busybox
 ```
 
 #### 自定义docker0桥的网络信息
@@ -467,15 +467,15 @@ docker run --rm -it --network none busybox
 
 ```bash
 # dockerd使用TCP监听0.0.0.0:2375之后 客户端可以远程执行CLI
-docker -H x.x.x.x:2375 image ls
-docker -H x.x.x.x:2375 ps -a
+$ docker -H x.x.x.x:2375 image ls
+$ docker -H x.x.x.x:2375 ps -a
 ```
 
 #### 创建自定义网络
 
 ```bash
 # 创建自定义网络
-docker network create -d bridge --subnet "172.26.0.0/16" --gateway "172.26.0.1" mybr0
+$ docker network create -d bridge --subnet "172.26.0.0/16" --gateway "172.26.0.1" mybr0
 
 # 使用自定义网络
 [root@master ~]# docker run -it --rm --name t1 --network mybr0 busybox
@@ -535,12 +535,12 @@ Docekr有两种类型的卷 每种类型都在容器中存在一个挂载点 但
 # 为docker run命令使用-v选项即可使用Volume
 
 # Docker-managed volume
-docker run -it --name t1 -v /data busybox
-docker inspect -f {{.Mounts}} t1
+$ docker run -it --name t1 -v /data busybox
+$ docker inspect -f {{.Mounts}} t1
 
 # Bind-mount Volume
-docker run -it -v HOSTDIR:VOLUMEDIR --name t2 bustbox
-docker inspect -f {{.Mount}} t2
+$ docker run -it -v HOSTDIR:VOLUMEDIR --name t2 bustbox
+$ docker inspect -f {{.Mount}} t2
 ```
 
 #### Sharing volumes
@@ -549,18 +549,18 @@ docker inspect -f {{.Mount}} t2
 # There are tow ways to share volumes between containers
 
 # 多个容器的卷使用同一个主机目录
-docker run -it --name t1 -v /docker/volumes/v1:/data busybox
-docker run -it --name t2 -v /docker/volumes/v1:/data busybox
+$ docker run -it --name t1 -v /docker/volumes/v1:/data busybox
+$ docker run -it --name t2 -v /docker/volumes/v1:/data busybox
 
 # 复制使用其他容器的卷 为docker run命令使用 --volumes-from 选项
-docker run -it --name t3 -v /docker/volumes/v1:/data busybox
-docker run -it --name t4 --volumes-from t3 busybox
+$ docker run -it --name t3 -v /docker/volumes/v1:/data busybox
+$ docker run -it --name t4 --volumes-from t3 busybox
 
 # 如果有多个容器需要共享网络名称空间(UTS Network IPC) 以及需要共享存储卷
 # 可以 事先创建一个 基础容器 其他的容器都加入该容器的网络名称空间(Joined Container) 并且复制该容器使用的卷(--volumes-from)
-docker run --name infracon -it -v /data/infracon/volume:/data busybox
-docker run --name nginx --network container:infracon --volumes-from infracon -it nginx
-docker run ... --network container:infracon --volumes-from infracon ...
+$ docker run --name infracon -it -v /data/infracon/volume:/data busybox
+$ docker run --name nginx --network container:infracon --volumes-from infracon -it nginx
+$ docker run ... --network container:infracon --volumes-from infracon ...
 ```
 
 ## Dockerfile
