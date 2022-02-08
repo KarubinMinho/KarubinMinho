@@ -708,6 +708,7 @@ The LABEL instruction adds metadata to an image (可替换MAINTANIER 并可添�
 - 第一种格式中 `<command>` 通常是一个shell命令 且以`/bin/sh -c`来运行它 这意味着此进程在容器中的PID不是1 不能接收Unix信号 因此 当使用`docker stop <container>`命令停止容器时 此进程接收不到SIGTERM信号
 - 第二种语法格式中的参数是一个JSON格式的数组 其中`<executable>`为要运行的命令 后面的`<paramN>`为传递给命令的选项或参数 然而 此种格式指定的命令不会以`/bin/sh -c`来发起 因此常见的shell操作如变量替换以及通配符`? *等`替换将不会进行 不过如果要运行的命令依赖于此shell特性的话 可以将其替换为类似下面的格式
   - `RUN ["/bin/sh", "-c", "<executable>", "<param1>"]`
+  - Json数组中 注意要使用**双引号**
 
 #### CMD
 
@@ -721,3 +722,144 @@ The LABEL instruction adds metadata to an image (可替换MAINTANIER 并可添�
   - `CMD ["<param1>", "<param2>"]`
 - 前两种语法格式的意义同`RUN`
 - 都三种则用于为`ENTRYPOINT`指令提供默认参数
+
+#### ENTRYPOINT
+
+- 类似`CMD`指令的功能 用于为容器指定默认运行程序 从而使得容器像是一个单独的可执行程序
+- 与`CMD`不同的是 由`ENTRYPOINT`启动的程序不会被`docker run`命令行指定的参数所覆盖 而且 这些命令行参数会被当作参数传递给`ENTRYPOINT`指令指定的程序
+  - 不过 `docker run`命令的`--entrypoint`选项的参数 可以覆盖`ENTRYPOINT`指令指定的程序
+- Syntax
+  - `ENTRYPOINT <command>`
+  - `ENTRYPOINT ["<executable>", "<param1>", "<param2>"]`
+- `docker run`命令传入的命令参数会覆盖`CMD`指令的内容 并且附加到`ENTRYPOINT`命令最后作为其参数使用
+- Dockerfile文件中也可以存在多个`ENTRYPOINT`指令 但仅有最后一个会生效
+
+Tips: 使用`ENTRYPOINT`解决配置文件**环境变量**使用问题
+
+```bash
+# 问题: nginx(或其他程序)配置文件有许多需要修改的配置
+# 比如: root_dir / listen_ip / listen_port 等等 
+# 使用容器的情况下 如何更优的解决该问题?
+```
+
+- docker-entrypoint.sh
+
+[参考:MySQL dokcer-entrypoint.sh](https://github.com/docker-library/mysql/blob/master/5.7/docker-entrypoint.sh)
+
+```bash
+#!/bin/sh
+
+# 根据变量(环境变量/自定义变量)生成配置文件
+# 需要修改的 传入环境变量的方式 比如: APP_ENV: TEST|PROD|DEV
+# docker run -d --name=ngx --env PORT=8080 --env XX=XX --rm ngx:v1
+IP=$(ip address show dev eth0 | awk '/inet /{split($2, ip, "/");print ip[1]}')
+
+cat > /etc/nginx/conf.d/www.conf << EOF
+server {
+    server_name ${HOSTNAME};
+    listen ${IP:-0.0.0.0}:${PORT:-80};
+    root ${NGX_DOC-ROOT:-/usr/share/nginx/html/};
+}
+
+EOF
+
+# Dockerfile CMD指定的参数($@) 取代当前shell 成为 main-process
+exec "$@"
+```
+
+- Dockerfile
+
+```Dockerfile
+FROM nginx:1.14-alpine
+
+LABEL maintainer="ilolicon <97431110@qq.com>"
+
+ENV NGX_DOC_ROOT="/data/www/html/"
+
+ADD index.html $NGX_DOC_ROOT
+ADD docker-entrypoint.sh /bin/
+
+CMD ["/usr/sbin/nginx", "-g", "daemon off"]
+
+# CMD指令参数 传递给docker-entrypoint.sh脚本 脚本用$@获取全部参数
+ENTRYPOINT ["/bin/docker-entrypoint.sh"]
+```
+
+#### USER
+
+- 用于指定运行image时或运行Dockerfile中任何`RUN CMD 或 ENTRYPOINT`指令指定的程序时的用户名或UID
+- 默认情况下 container的运行身份为root用户
+- Syntax
+  - `USER <UID>|<UserName>`
+  - 需要注意的是 `<UID>`可以为任意数字 但实践中其必须为`/etc/passwd`(容器中)中某用户的有效UID 否则`docker run`命令将运行失败
+
+#### HEALTHCHECK
+
+[HEALTHCHECK](https://docs.docker.com/engine/reference/builder/#healthcheck)
+
+- The `HEALTHCHECK` instruction tells Docker how to test a container to check that it is still working
+- This can detect cases such as a web server that is stuck in an infinite loop and unable to handle new connections, even though the server process is still running
+- The HEALTHCHECK instruction has two forms
+  - `HEALTHCHECK [OPTIONS] CMD command` (check container health by running a command inside the container)
+  - `HEALTHCHECK NONE` (disable any healthcheck inherited from the base image)
+- The options that can appear before CMD are:
+  - --interval=DURATION (default: 30s)
+  - --timeout=DURATION (default: 30s)
+  - --start-period=DURATION (default: 0s) - 多少秒之后开始检测 等待container init的时间
+  - --retries=N (default: 3)
+- The command’s exit status indicates the health status of the container. The possible values are:
+  - 0: success - the container is healthy and ready for use
+  - 1: unhealthy - the container is not working correctly
+  - 2: reserved - do not use this exit code - 预留 不要使用
+- For example
+  - `HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost/ || exit 1`
+
+#### SHELL
+
+[SHELL](https://docs.docker.com/engine/reference/builder/#shell)
+
+- The `SHELL` instruction allows the default *shell* used for the shell form of commands to be overridden
+- The default shell on Linux is ["/bin/sh", "-c"], and on Windows is ["cmd", "/S", "/C"]
+- The `SHELL` instruction must be written in JSON form in a Dockerfile
+  - Syntax: SHELL ["executable", "parameters"]
+- The `SHELL` instruction can appear multiple times
+- Each `SHELL` instruction overrides all previous `SHELL` instructions, and affects all subsequent instruction
+
+#### STOPSIGNAL
+
+[STOPSIGNAL](https://docs.docker.com/engine/reference/builder/#stopsignal)
+
+- The `STOPSIGNAL` instruction sets the system call signal that will be sent to the container to exit
+- This signal can be a signal name in the format `SIG<NAME>`, for instance `SIGKILL`, or an unsigned number that matches a position in the kernel’s syscall table, for instance `9`
+  - The default is `SIGTERM` if not defined
+- Syntax: `STOPSIGNAL signal`
+
+#### ARG
+
+[ARG](https://docs.docker.com/engine/reference/builder/#arg)
+
+- The ARG instruction defines a variable that users can pass at build-time to the builder with the docker build command using the `--build-arg <varname>=<value>` flag
+- If a user specifies a build argument that was not defined in the Dockerfile, the build outputs a warning
+  - `[Warning] One or more build-args [foo] were not consumed.`
+- Syntax: `ARG <name>[=<default value>]`
+- A Dockerfile may include one or more `ARG` instructions
+- An `ARG` instruction can optionally include a default value:
+  - `ARG user1=someuser`
+  - `ARG buildno=1`
+
+⚠️ **Warning**
+It is not recommended to use build-time variables for passing secrets like github keys, user credentials etc. Build-time variable values are visible to any user of the image with the `docker history` command.
+
+Refer to the ["build images with BuildKit"](https://docs.docker.com/develop/develop-images/build_enhancements/#new-docker-build-secret-information) section to learn about secure ways to use secrets when building images.
+
+#### ONBUILD
+
+- 用于在Dockerfile中定义一个触发器
+- Dockerfile用于build映像文件 此映像文件亦可作为base image被另一个Dockerfile用作`FROM`指令的参数 并以之构建新的镜像文件
+- 在后面的这个Dockerfile中的`FROM`指令在build过程中被执行时 将会**触发**创建其base image的Dockerfile文件中的`ONBUILD`指令定义的触发器
+- Syntax
+  - `ONBUILD <INSTRUCTION>`
+- 尽管任何指令都可以注册成为触发器指令 但`ONBUILD`不能自我嵌套 且不会触发`FROM`和`MAINTAINER`指令
+- 使用包含`ONBUILD`指令的Dockerfile构建的镜像应该使用特殊的标签
+  - e.g: ruby:2.0-onbuild
+- 在`ONBUILD`指令中使用`ADD`或`COPY`指令应该格外小心 因为新构建过程的上下文在缺少指定的源文件时会失败
