@@ -288,7 +288,7 @@ Docker镜像含有启动容器所需的文件系统及其内容 因此 其用于
   
 #### docker hub
 
-[docker-hub](https://docs.docker.com/docker-hub/)
+[DockerHub](https://docs.docker.com/docker-hub/)
 
 Docker Hub provides the following major features:
 
@@ -302,6 +302,7 @@ Docker Hub provides the following major features:
 #### docker pull
 
 [pull-commandline](https://docs.docker.com/engine/reference/commandline/pull/)
+
 [quay.io](https://quay.io/)
 
 ```bash
@@ -347,14 +348,14 @@ SDN
 Overlay Network(叠加网络)
 
 # docker默认的三种网络
-[root@master ~]# docker network ls
+[ilolicon@master ~]$ docker network ls
 NETWORK ID     NAME      DRIVER    SCOPE
 78fa953ed316   bridge    bridge    local # 桥接 默认NAT桥
 8ec55273feb2   host      host      local # 让容器直接使用宿主机的网络名称空间
 9081fe29a218   none      null      local # 只有lo接口 没有其他网卡
 
-[root@master ~]# yum -y install bridge-utils
-[root@master ~]# brctl show
+[ilolicon@master ~]$ yum -y install bridge-utils
+[ilolicon@master ~]$ brctl show
 ```
 
 ![Four network container archetypes](./icons/four-network-container-archetypes.png)
@@ -431,6 +432,7 @@ $ docker run --rm -it --network host busybox
 #### Closed Container
 
 ```bash
+# --network none
 $ docker run --rm -it --network none busybox
 ```
 
@@ -478,7 +480,7 @@ $ docker -H x.x.x.x:2375 ps -a
 $ docker network create -d bridge --subnet "172.26.0.0/16" --gateway "172.26.0.1" mybr0
 
 # 使用自定义网络
-[root@master ~]# docker run -it --rm --name t1 --network mybr0 busybox
+[ilolicon@master ~]$ docker run -it --rm --name t1 --network mybr0 busybox
 / # ifconfig
 eth0      Link encap:Ethernet  HWaddr 02:42:AC:1A:00:02  
           inet addr:172.26.0.2  Bcast:172.26.255.255  Mask:255.255.0.0
@@ -746,7 +748,7 @@ Tips: 使用`ENTRYPOINT`解决配置文件**环境变量**使用问题
 
 - docker-entrypoint.sh
 
-[参考:MySQL dokcer-entrypoint.sh](https://github.com/docker-library/mysql/blob/master/5.7/docker-entrypoint.sh)
+[refer:MySQL dokcer-entrypoint.sh](https://github.com/docker-library/mysql/blob/master/5.7/docker-entrypoint.sh)
 
 ```bash
 #!/bin/sh
