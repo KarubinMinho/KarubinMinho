@@ -269,6 +269,8 @@ Docker镜像含有启动容器所需的文件系统及其内容 因此 其用于
   - Mirror Registry: 第三方的registry 只让客户使用(云)
   - Vendor Registry: 由发布Docker镜像的供应商提供的registry(redhat)
   - Private Registry: 通过设有防火墙和额外安全层的私有实体提供的registry(自建)
+    - [docker-registry/docker-distribution](https://hub.docker.com/_/registry)
+    - [harbor](https://goharbor.io/)
 
 ![docker registry](./icons/docker-registry.png)
 
@@ -862,4 +864,94 @@ Refer to the ["build images with BuildKit"](https://docs.docker.com/develop/deve
 - 尽管任何指令都可以注册成为触发器指令 但`ONBUILD`不能自我嵌套 且不会触发`FROM`和`MAINTAINER`指令
 - 使用包含`ONBUILD`指令的Dockerfile构建的镜像应该使用特殊的标签
   - e.g: ruby:2.0-onbuild
-- 在`ONBUILD`指令中使用`ADD`或`COPY`指令应该格外小心 因为新构建过程的上下文在缺少指定的源文件时会失败
+- 在`ONBUILD`指令中使用`ADD`或`COPY`指令应该格外小心 因为新 构建过程的上下文在缺少指定的源文件时会失败
+
+## Docker资源限制
+
+[Limit a container's resourcesresource_constraints](https://docs.docker.com/config/containers/resource_constraints/)
+
+- By default, a container has no resource constraints and can use as much of a given resource as the host’s kernel scheduler allows
+- Docker provides ways to control how much memory, or CPU a container can use, setting runtime configuration flags of the `docker run` command
+- Many of these features require your kernel to support Linux capabilities
+  - To check for support, you can use the `docker info` command
+
+### OOME
+
+- On Linux hosts, if the kernel detects that there is not enough memory to perform important system functions, it throws an `OOME`, or `Out Of Memory Exception`, and starts killing processes to free up memory
+  - 一旦发生OOME 任何进程都有可能被杀死 包括docker daemon在内
+  - 为此 Docker特地调整了docker daemon的OOM优先级 以免它被内核"正法" 但容器优先级并为调整
+  - `Memory Hogs` `OOM_ADJ` `OOM_SCORE`
+
+#### Limit a container’s access to memory
+
+- Docker can enforce hard memory limits, which allow the container to use no more than a given amount of user or system memory
+- or soft limits, which allow the container to use as much memory as it needs unless certain conditions are met, such as when the kernel detects low memory or contention on the host machine
+- Some of these options have different effects when used alone or when more than one option is set
+- Most of these options take a positive integer, followed by a suffix of `b, k, m, g`, to indicate bytes, kilobytes, megabytes, or gigabytes
+
+| Option | Description |
+| ----- | ----- |
+| `-m` or `--memory=` | The maximum amount of memory the container can use. If you set this option, the minimum allowed value is `6m` (6 megabytes). That is, you must set the value to at least 6 megabytes. |
+| `--memory-swap *` | The amount of memory this container is allowed to swap to disk. See [`--memory-swap` details](https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details). |
+| `--memory-swappiness` | By default, the host kernel can swap out a percentage of anonymous pages used by a container. You can set `--memory-swappiness` to a value between 0 and 100, to tune this percentage. See [`--memory-swappiness` details](https://docs.docker.com/config/containers/resource_constraints/#--memory-swappiness-details). |
+| `--memory-reservation` | Allows you to specify a soft limit smaller than `--memory` which is activated when Docker detects contention or low memory on the host machine. If you use `--memory-reservation`, it must be set lower than `--memory` for it to take precedence. Because it is a soft limit, it does not guarantee that the container doesn’t exceed the limit. |
+| `--kernel-memory` | The maximum amount of kernel memory the container can use. The minimum allowed value is `4m`. Because kernel memory cannot be swapped out, a container which is starved of kernel memory may block host machine resources, which can have side effects on the host machine and on other containers. See [`--kernel-memory` details](https://docs.docker.com/config/containers/resource_constraints/#--kernel-memory-details). |
+| `--oom-kill-disable` | By default, if an out-of-memory (OOM) error occurs, the kernel kills processes in a container. To change this behavior, use the `--oom-kill-disable` option. Only disable the OOM killer on containers where you have also set the `-m/--memory` option. If the `-m` flag is not set, the host can run out of memory and the kernel may need to kill the host system’s processes to free memory. |
+
+#### --memory-swap
+
+- Using swap allows the container to write excess memory requirements to disk when the container has exhausted all the RAM that is available to it
+- `--memory-swap` is a modifier flag that only has meaning if `--memory` is also set
+
+| `--memory-swap` | `--memory` | 功能 |
+| ----- | ----- | ----- |
+| 正数S | 正数M | 容器可用总空间为S 其中ram为M swap为(S-M) 若S=M 则无可用swap资源 |
+| 0 | 正数M | 相当于未设置swap(unset) |
+| unset | 正数M | 若主机(Docker Host)启用了swap 则容器的可用swap为 2*M |
+| -1 | 正数M | 若主机(Docker Host)启用了swap 则容器可使用最大至主机的所有swap空间的swap资源 |
+
+⚠️ **注意:** 在容器内使用free命令可以看到的swap空间 并不具有其所展示出的空间指示意义
+
+### CPU
+
+[深入Linux的进程优先级](https://linux.cn/article-7325-1.html)
+
+- By default, each container’s access to the host machine’s CPU cycles is unlimited
+- You can set various constraints to limit a given container’s access to the host machine’s CPU cycles
+- Most users use and configure the [default CFS scheduler](https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler)
+- You can also configure the [realtime scheduler](https://docs.docker.com/config/containers/resource_constraints/#configure-the-realtime-scheduler).
+
+#### Configure the default CFS scheduler
+
+The CFS is the Linux kernel CPU scheduler for normal Linux processes. Several runtime flags allow you to configure the amount of access to CPU resources your container has. When you use these settings, Docker modifies the settings for the container’s cgroup on the host machine.
+
+| Option | Description |
+| ----- | ----- |
+| `--cpus=<value>` | Specify how much of the available CPU resources a container can use. For instance, if the host machine has two CPUs and you set `--cpus="1.5"`, the container is guaranteed at most one and a half of the CPUs. This is the equivalent of setting `--cpu-period="100000"` and `--cpu-quota="150000"`. |
+| `--cpu-period=<value>` | Specify the CPU CFS scheduler period, which is used alongside `--cpu-quota`. Defaults to 100000 microseconds (100 milliseconds). Most users do not change this from the default. For most use-cases, `--cpus` is a more convenient alternative. |
+| `--cpu-quota=<value>` | Impose a CPU CFS quota on the container. The number of microseconds per `--cpu-period` that the container is limited to before throttled. As such acting as the effective ceiling. For most use-cases, `--cpus` is a more convenient alternative. |
+| `--cpuset-cpus` | Limit the specific CPUs or cores a container can use. A comma-separated list or hyphen-separated range of CPUs a container can use, if you have more than one CPU. The first CPU is numbered 0. A valid value might be `0-3` (to use the first, second, third, and fourth CPU) or `1,3` (to use the second and fourth CPU). |
+| `--cpu-shares` | Set this flag to a value greater or less than the default of 1024 to increase or reduce the container’s weight, and give it access to a greater or lesser proportion of the host machine’s CPU cycles. This is only enforced when CPU cycles are constrained. When plenty of CPU cycles are available, all containers use as much CPU as they need. In that way, this is a soft limit. `--cpu-shares` does not prevent containers from being scheduled in swarm mode. It prioritizes container CPU resources for the available CPU cycles. It does not guarantee or reserve any specific CPU access. |
+
+```bash
+# If you have 1 CPU, each of the following commands guarantees the container at most 50% of the CPU every second.
+$ docker run -it --cpus=".5" ubuntu /bin/bash
+
+# Which is the equivalent to manually specifying --cpu-period and --cpu-quota;
+$ docker run -it --cpu-period=100000 --cpu-quota=50000 ubuntu /bin/bash
+```
+
+### 测试
+
+[stress](https://hub.docker.com/r/polinux/stress)
+
+```bash
+# 使用stress镜像 进行测试
+$ docker run -ti --rm polinux/stress stress --cpu 1 --io 1 --vm 1 --vm-bytes 128M --timeout 1s --verbose
+
+# 显示容器的运行进程
+$ docker top CONTAINER
+
+# 显示容器资源使用统计的实时流
+$ docker stats
+```
