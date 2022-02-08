@@ -868,7 +868,7 @@ Refer to the ["build images with BuildKit"](https://docs.docker.com/develop/deve
 
 ## Docker资源限制
 
-[Limit a container's resourcesresource_constraints](https://docs.docker.com/config/containers/resource_constraints/)
+[Limit a container's resources](https://docs.docker.com/config/containers/resource_constraints/)
 
 - By default, a container has no resource constraints and can use as much of a given resource as the host’s kernel scheduler allows
 - Docker provides ways to control how much memory, or CPU a container can use, setting runtime configuration flags of the `docker run` command
