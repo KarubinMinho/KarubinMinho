@@ -53,7 +53,10 @@
     - 容器运行时(容器引擎): 运行容器 支持[Docker](https://kubernetes.io/zh/docs/reference/kubectl/docker-cli-to-kubectl/)/[containerd](https://containerd.io/docs/)/[CRI-O](https://cri-o.io/#what-is-cri-o)以及任何实现 [Kubernetes CRI (容器运行环境接口)](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md)
 
 [kubernetes组件](https://kubernetes.io/zh/docs/concepts/overview/components/)
+
 ![kuberbetes-cluster02](./icons/kubernetes_cluster02.png)
+
+![components-of-kubernetes](./icons/components-of-kubernetes.svg)
 
 ## Pod
 
@@ -90,6 +93,25 @@
 
 依赖第三方插件(附件) 通过CNI(容器网络接口)接入
 
-- flannel
+- flannel: 网络配置 Pod网络-10.244.0.0/16
+- calico: 网络配置 网络策略
+- canel: 上面两种搭配使用
+- ...
+
+![network](./icons/network.png)
 
 ## Namespace
+
+- 管理的边界
+- 隔离不同名称空间的网络
+
+## 初始化Kubernetes集群
+
+![structure](./icons/structure.png)
+
+![structure02](./icons/structure02.png)
+
+- [kubeadm](https://github.com/kubernetes/kubeadm)
+  - master/nodes: 安装`kubetlet` `kubeadm` `docker`
+  - master: `kubeadm init`
+  - nodes: `kubeadm join`
