@@ -4,7 +4,9 @@
 
 docker_repo() {
     URL=https://download.docker.com/linux/centos/docker-ce.repo
-    /usr/bin/curl -s $URL -o /etc/yum.repos.d/docker-ce.repo
+    REPO_PATH=/etc/yum.repos.d/docker-ce.repo
+    /usr/bin/curl -s $URL -o $REPO_PATH
+    sed -i '/^baseurl=/s/download.docker.com/mirrors.aliyun.com\/docker-ce/' $REPO_PATH
 }
 
 uninstall_old_versions() {
