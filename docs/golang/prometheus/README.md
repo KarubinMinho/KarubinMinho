@@ -1,10 +1,10 @@
-# Prometheus基础
+# ⭐ Prometheus
 
 [官网](https://prometheus.io/)
 
 ## 安装
 
-[官网下载二进制包](https://prometheus.io/download/)
+[二进制包安装](https://prometheus.io/download/)
 
 ```bash
 #!/usr/bin/env bash
@@ -16,15 +16,17 @@ cd /usr/local/
 ln -sv prometheus-${VERSION}.linux-amd64/ prometheus
 ```
 
-[配置yum仓库](https://packagecloud.io/app/prometheus-rpm/release/search)
+[yum安装](https://packagecloud.io/app/prometheus-rpm/release/search)
 
 ```bash
 curl -s https://packagecloud.io/install/repositories/prometheus-rpm/release/script.rpm.sh | sudo bash
 ```
 
+[docker-compose安装](https://github.com/ilolicon/prometheus-compose)
+
 ## 基础认证
 
-[BasicAuth参考](https://prometheus.io/docs/guides/basic-auth/)
+[BasicAuth](https://prometheus.io/docs/guides/basic-auth/)
 
 ```bash
 # Web Basic
@@ -66,7 +68,7 @@ scrape_configs:  # 采集/刮擦的配置
     static_configs:  # 静态配置
     - targets: ['localhost:9090']  # targets 可以是静态配置 也可以是自动发现
     
-# 默认使用：http 默认采集路径：/metrics
+# 默认使用: http 默认采集路径: /metrics
 scheme: http
 metrics_path: /metrics
 ```
@@ -89,15 +91,15 @@ systemctl restart node_exporter
 
 [黑盒监控](https://www.infoq.cn/article/sxextntuttxduedeagiq)
 
-[网络探测 黑盒监控](https://cloud.tencent.com/developer/article/1584310)
+[网络探测黑盒监控](https://cloud.tencent.com/developer/article/1584310)
 
 ```bash
 # blackbox_exporter 在执行ICMP时 只发送一个数据包
-# 因此 “数据包数量”的等价物基于probe_success度量
+# 因此 "数据包数量"的等价物基于probe_success度量
 
-# 包数： count_over_time(probe_success[5m])
-# 返回数据包数： sum_over_time(probe_success[5m])
-# 可用性： avg_over_time(probe_success[5m])
+# 包数: count_over_time(probe_success[5m])
+# 返回数据包数: sum_over_time(probe_success[5m])
+# 可用性: avg_over_time(probe_success[5m])
 ```
 
 ### 自定义exporter
@@ -114,31 +116,31 @@ systemctl restart node_exporter
 
 #### 指标类型
 
-> Counter
-> Guage
-> Histogram
-> Summary
+- Counter
+- Guage
+- Histogram
+- Summary
 
 #### 标签是否动态
 
->固定标签
->动态标签
+- 固定标签
+- 动态标签
 
 #### 开发流程
 
-> 1. 指定指标
-> 2. 注册指标
-> 3. 启动web服务器(注册promhttp Handler)
-> 4. 指标信息更新
+1. 指定指标
+2. 注册指标
+3. 启动web服务器(注册promhttp Handler)
+4. 指标信息更新
 
 #### 指标信息更新
 
-> a). 指标信息提供者
->
-> 1. 事件触发型 如：http请求时更新
-> 2. 事件触发型 如：周期性更新
->
-> b). Prometheus调用metrics api触发获取
+- 指标信息提供者
+
+1. 事件触发型 如:http请求时更新
+2. 事件触发型 如:周期性更新
+
+- Prometheus调用metrics api触发获取
 
 #### 示例
 
@@ -383,36 +385,46 @@ func AfterExec(ctx *context.Context) {
 
 ## PromQL
 
-> Prometheus提供PromQL功能用于时许数据的查询和统计
+Prometheus提供PromQL功能用于时许数据的查询和统计
 
 ### 表达式数据类型
 
 - 瞬时向量
 
-  > 针对每个查询结果集单项中只包含一组时序数据和样本值
+```bash
+针对每个查询结果集单项中只包含一组时序数据和样本值
+```
 
 - 范围向量
 
-  > 针对每个查询结果集单项中包含多组时许数据和样本值 带时间区间
+```bash
+针对每个查询结果集单项中包含多组时许数据和样本值 带时间区间
+```
 
 - 标量
 
-  > 浮点型数据 float64
+```bash
+浮点型数据 float64
+```
 
 - 字符串
 
-  > 字符串类型 string
+```bash
+字符串类型 string
+```
 
 ### 瞬时向量查询
 
 - 指定指标名称查询
 
-> up
-> prometheus_http_requests_total
-> node_boot_time_seconds
-> node_cpu_percent
-> node_mem_percent
-> node_cpu_seconds_total
+```bash
+up
+prometheus_http_requests_total
+node_boot_time_seconds
+node_cpu_percent
+node_mem_percent
+node_cpu_seconds_total
+```
 
 ```bash
 # 指标名若未prometheus关键字 则必须使用__name__标签指定指标名称进行查询
@@ -447,22 +459,22 @@ node_cpu_seconds_total{mode!~"idle|system"}
 
 ### 范围向量查询
 
-> 在瞬时向量查询表达式后 使用[]指定查询数据时间范围 默认相对当前时间
+在瞬时向量查询表达式后 使用[]指定查询数据时间范围 默认相对当前时间
 
 ```bash
 # 时间单位
 # 秒： s
 # 分： m
-node_cpu_percent[5m]
 # 时： h
 # 天： d
 # 周： w
 # 年： y
+node_cpu_percent[5m]
 ```
 
 ### 偏移量
 
-> 修改查询数据偏移时间
+修改查询数据偏移时间
 
 ```bash
 # 5分钟前的cpu使用率
@@ -474,7 +486,7 @@ node_cpu_percent[5m] offset 5m
 
 ### 子查询
 
-> 查询给定时间范围及刻度范围向量
+查询给定时间范围及刻度范围向量
 
 ```bash
 irate(node_cpu_percent[5m])[30m:1m]
@@ -548,30 +560,30 @@ topk
 abs
 absent
 absent_over_time # 有over_time说明操作数据是范围向量 没有则操作瞬时向量
-ceil # 向上取整
+ceil             # 向上取整
 floor
 changes
-clamp_max # 设置瞬时向量样本最大值/最小值
+clamp_max        # 设置瞬时向量样本最大值/最小值
 clamp_min
 day_of_month
-delta # 第一个值和最后一个值的差
-idelta # 适用敏感性较强的时序数据
+delta            # 第一个值和最后一个值的差
+idelta           # 适用敏感性较强的时序数据
 deriv
 exp
-rate # 计算时序数据每秒平均增长率
+rate             # 计算时序数据每秒平均增长率
 irate
 increase
 time
 timestamp
-resets # 计算重置次数
+resets           # 计算重置次数
 round
 scalar
 vector
-<op>_over_time # 操作范围向量
+<op>_over_time   # 操作范围向量
 ...
 ```
 
-### 示例
+### PromQL示例
 
 ```bash
 # 每台主机CPU在5分钟内的平均使用率
@@ -586,12 +598,12 @@ sum(rate(node_network_receive_bytes_total{device="eth0"}[5m]) * 8 * on(instance)
 ### 查询
 
 ```bash
-# 和web界面发起请求的url一致
+和web界面发起请求的url一致
 ```
 
 ### 管理员
 
-> 需命令行参数 --web.enable-admin-api 开启
+需命令行参数 `--web.enable-admin-api` 开启
 
 ```bash
 # 功能
@@ -604,7 +616,7 @@ sum(rate(node_network_receive_bytes_total{device="eth0"}[5m]) * 8 * on(instance)
 
 ### 生命周期管理
 
-> 需命令行参数 --web.enable-lifecycle 开启
+需命令行参数 `--web.enable-lifecycle` 开启
 
 ```bash
 # 功能
@@ -614,31 +626,28 @@ sum(rate(node_network_receive_bytes_total{device="eth0"}[5m]) * 8 * on(instance)
 - 退出 /-/quit
 ```
 
-## 联后模式
+## 联合模式
 
-> 联邦集群
->
-> 联合模式允许Prometheus从另一个Prometheus服务器抓取数据
->
-> metrices_path: /federate
+```bash
+# 联邦集群
+
+联合模式允许Prometheus从另一个Prometheus服务器抓取数据
+metrices_path: /federate
+```
 
 ## 告警管理
 
 ### 用途
 
-> 告警分组
->
-> 静默处理
->
-> 抑制处理
->
-> 高可用(配置多个AlertManager)
->
-> 发送处理
+- 告警分组
+- 静默处理
+- 抑制处理
+- 高可用(配置多个AlertManager)
+- 发送处理
 
 ### 配置
 
-> 参考官方文档
+参考官方文档
 
 ### 管理API
 
@@ -649,226 +658,6 @@ sum(rate(node_network_receive_bytes_total{device="eth0"}[5m]) * 8 * on(instance)
 - 重新加载配置 /-/reload # 如果开启一定要注意访问权限
 ```
 
-# Prometheus配置管理
-
-> cmdb web prometheus配置
->
-> promagentd:
->
-> ​ API：
->
-> ​  注册
->
-> ​  心跳
->
-> ​  配置获取
->
-> ​ Agentd:
->
-> ​  注册： 周期性 1h
->
-> ​  心跳： 周期性 1m
->
-> ​  获取配置： 周期性 15m(会有延迟)
->
-> Q: 如何减少获取配置延迟？
->
-> A: 间隔缩短至1min 但是这个时候配置不一定改变 需要检测配置是否变化 不变化则不用更新  定义：version/update_at字段 比较复杂的可以实现在心跳接口 发生变更再调用获取配置接口更新配置
->
-> ​  更新prometheus.yml
->
-> ​  kill -HUP $(pidof prometheus)
-
-## logrus日志库
-
-[logrus](https://pkg.go.dev/github.com/sirupsen/logrus)
-
-```go
-package main
-
-import (
- log "github.com/sirupsen/logrus"
- "gopkg.in/natefinch/lumberjack.v2"
-)
-
-func main() {
- // handler, err := os.Create("logs/run.log")
- // if err != nil {
- //  log.Fatal(err)
- // }
- handler := &lumberjack.Logger{
-  Filename:   "logs/run.log",
-  MaxSize:    1, // Megabytes
-  MaxBackups: 7,
-  LocalTime:  true,
-  Compress:   true,
- }
- defer handler.Close()
-
- log.SetLevel(log.DebugLevel) // 默认info级别
- log.SetFormatter(&log.TextFormatter{})
- // log.SetFormatter(&log.JSONFormatter{}) // json格式
-
- log.SetReportCaller(true) // 打印在哪个文件 哪一行输出的日志消息
- log.SetOutput(handler)
-
- for i := 0; i <= 10000; i++ {
-  log.WithFields(log.Fields{
-   "test":  "1",
-   "test2": 2,
-  }).Error("error")
-  log.Warn("warning")
-  log.Info("info")
-  log.Debug("debug")
- }
-}
-```
-
-## lumberjack日志切割库
-
-[lumberjack](https://pkg.go.dev/gopkg.in/natefinch/lumberjack.v2)
-
-## viper配置解析库
-
-[viper](https://pkg.go.dev/github.com/spf13/viper)
-
-```yaml
----
-web:
-  addr: 0.0.0.0:9999
-  auth:
-    user: Minho
-    password: 123@456
-
-mysql:
-  host: 127.0.0.2
-  port: 3307
-  user: golang
-  password: test@123
-  db: cmdb
-```
-
-```go
-package main
-
-import (
- "fmt"
- "log"
-
- "github.com/spf13/viper"
-)
-
-type webConfig struct {
- Addr string
- Auth struct {
-  User     string
-  Password string
- }
-}
-
-type mysqlConfig struct {
- // 标签指定字段映射
- Addr string `mapstructure:"host"`
- Port int
-}
-
-type Config struct {
- Web   webConfig
- MySQL mysqlConfig
-}
-
-func main() {
- // 开启功能：从环境变量读取配置
- // 优先级：环境变量 > 配置文件 > 默认值
- viper.AutomaticEnv()
- // 设置环境变量以 prefix_ 开头才能读取到配置
- viper.SetEnvPrefix("testviper") // testviper_web.addr
-
- // 设置默认值
- // 没有配置文件 或者 配置文件没有配置相关的值 => 使用默认值
- viper.SetDefault("web.addr", ":10000")
- viper.SetDefault("mysql.host", "127.0.0.1")
- viper.SetDefault("mysql.port", 3306)
- viper.SetDefault("mysql.user", "root")
- viper.SetDefault("mysql.password", "")
-
- viper.SetConfigName("config")
- viper.SetConfigType("yaml")
-
- // 增加多个查找目录 
- viper.AddConfigPath("./etc/")
- viper.AddConfigPath(".")
-    // 如何固定一个配置文件
-    // viper.SetConfigFile(xx.yml)
-
- if err := viper.ReadInConfig(); err != nil {
-  if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-   log.Println("config not found, use default")
-  } else {
-   log.Fatal(err)
-  }
- }
-
- fmt.Println(viper.GetString("web.addr"))
- fmt.Println(viper.GetString("web.auth.user"))
- fmt.Println(viper.GetString("web.auth.password"))
- fmt.Println(viper.GetString("mysql.host"))
- fmt.Println(viper.GetString("mysql.port"))
-
- fmt.Println("=========")
-
- var config Config
- err := viper.Unmarshal(&config)
- fmt.Println(err)
- fmt.Printf("%#v\n", config)
- fmt.Println(config.MySQL.Addr)
- fmt.Println(config.MySQL.Port)
-}
-```
-
-## req客户端请求库
-
-[req](https://pkg.go.dev/github.com/imroc/req)
-
-```go
-package main
-
-import (
- "crypto/tls"
- "fmt"
- "net/http"
-
- "github.com/imroc/req"
-)
-
-func main() {
- req.Debug = true
- client := &http.Client{
-  Transport: &http.Transport{
-   TLSClientConfig: &tls.Config{
-    InsecureSkipVerify: true,
-   },
-  },
- }
-
- request := req.New()
- // 心跳
- // {uuid: "xx"}
- response, err := request.Post("https://localhost:8888/v1/agent/heartbeat", req.Param{
-  "uuid": "xxxx",
- }, req.Header{"x-token": "820923a1a2dad74e8d279c48b8a1160c"}, client)
-
- if err == nil {
-  rt := make(map[string]interface{})
-  response.ToJSON(&rt)
-  fmt.Println(rt)
- }
-}
-```
-
-## cobra子命令
-
-
-# Alertmanager
+## Alertmanager
 
 [alertmanager](https://prometheus.io/docs/alerting/)
