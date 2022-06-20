@@ -1,8 +1,10 @@
 # ⭐ GO BLOG LINK
 
-- 配置文件解析
+- Blogs
 
     [使用Viper解码自定义格式](https://sagikazarmark.hu/blog/decoding-custom-formats-with-viper/)
+
+    [String padding in Go](https://gosamples.dev/string-padding/)
 
 ---
 
