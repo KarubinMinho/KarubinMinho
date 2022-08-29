@@ -1,4 +1,4 @@
-# :whale: Prometheus监控
+# :whale: Prometheus监控系统
 
 [![prometheus](https://img.shields.io/badge/prometheus-v2.x+-E44F34)](https://prometheus.io/docs/introduction/overview/)
 
@@ -155,7 +155,7 @@
 ### Pull and Push
 
 - Prometheus同其它TSDB相比有一个非常典型的特征: 它主动从各Targers上**拉取(pull)** 数据 而非等待被监控端的**推送(Push)**
-- 两种方式各有优劣 其中 Pull模型的优势在于: 
+- 两种方式各有优劣 其中 Pull模型的优势在于:
   - 集中控制: 有利于将配置集中在Prometheus Server上完成 包括指标及采集速率等
   - Prometheus的根本目标在于收集在Target上预先完成聚合的聚合型数据 而非一款由事件驱动的存储系统
 
@@ -203,7 +203,7 @@
   - Gauge: **仪表盘** 用于存储有着起伏特征的指标数据 例如: 内存使用情况等
     - Gauge是Counter的超集 但存在指标数据丢失的可能性
     - Counter能让用户确切了解指标随的变化状态 而Gauge则可能随时间流逝而精准度越来越低
-  - Histogram: **直方图** 它会在一段时间范围内对数据进行采样 并将其计入可配置的bucket中 Histigram能够存储更多的信息 包括样本值分布在每个bucket中的数量、所有样本值之和以及总的样本数量 从而Prometheus能够使用内置的函数进行如下操作: 
+  - Histogram: **直方图** 它会在一段时间范围内对数据进行采样 并将其计入可配置的bucket中 Histigram能够存储更多的信息 包括样本值分布在每个bucket中的数量、所有样本值之和以及总的样本数量 从而Prometheus能够使用内置的函数进行如下操作:
     - 计算样本平均值: 以值的总和除以值的数量
     - 计算样本分为值: 分为数有助于了解符合特定标准的数据个数 如: 评估响应时长超过1s的请求比例 若超过20%即发送告警等
   - Summary: **摘要** Histogram的扩展类型 但它是直接由被检测端自行聚合计算出分位数 并将计算结果响应给Prometheus Server的样本采集请求
@@ -264,7 +264,7 @@
     - 已用空间: 总空间减去可用空间
     - 实用率: 已用空间除以总空间
 
-## Exporters
+## Exporter
 
 [exporters-and-integrans](https://prometheus.io/docs/instrumenting/exporters/#exporters-and-integrations)
 
@@ -710,20 +710,20 @@
 
 ```yaml
 - job_name: "nodes"
-	file_sd_configs:
-	  - files:
-		  - targets/prometheus/node*.yaml
-		
-	relabel_configs:
-	  - source_labels:
-	      - __scheme__
-		    - __address__
-		    - __metrics_path__
-	    regex: "(http|https)(.*)"
-	    separator: ""
-	    target_label: "endpoint"
-	    replacement: "${1}://${2}"
-	    action: replace
+  file_sd_configs:
+   - files:
+     - targets/prometheus/node*.yaml
+
+  relabel_configs:
+   - source_labels:
+       - __scheme__
+       - __address__
+       - __metrics_path__
+     regex: "(http|https)(.*)"
+     separator: ""
+     target_label: "endpoint"
+     replacement: "${1}://${2}"
+     action: replace
 ```
 
 ##### labelmap示例
@@ -732,14 +732,14 @@
 
 ```yaml
 - job: "nodes"
-	file_sd_configs:
-		- fles:
-			- targets/prometheus/node*.yaml
-		
-	relabel_configs:
-		- regex: "(job|app)"
-			replacement: "${1}_name"
-			action: labelmap
+  file_sd_configs:
+  - fles:
+    - targets/prometheus/node*.yaml
+
+  relabel_configs:
+  - regex: "(job|app)"
+    replacement: "${1}_name"
+    action: labelmap
 ```
 
 ### 对抓取到的metric重新打标
@@ -753,25 +753,23 @@
   - 应该明确地使用各个标签 并尽可能保持不变 以避免创建出一个动态的数据环境
   - 标签是时间序列的唯一约束 删除标签并导致时间序列重复时 可能会导致系统出现问题
 
-##### metric relabel删除示例
+#### metric relabel删除示例
 
 - 在source_label字段上 通过指标上的元标签`__name__`引用指标名称 而后由regex进行匹配判断 可使用drop action删除匹配的指标 或使用keep action仅保留匹配的指标
 - 下面的示例 用于在相应的job上 在发现的各target上 删除以 go_info 为前缀的指标
 
 ```yaml
 - job_name: "nodes"
-	file_sd_configs:
-		- files:
-			- targets/prometheus/node*.yaml
-			
-	metric_relabel_configs:
-		- source_labels:
-			  - __name__
-			regex: "go_info.*"
-			action: drop
+  file_sd_configs:
+  - files:
+    - targets/prometheus/node*.yaml
+
+  metric_relabel_configs:
+  - source_labels:
+      - __name__
+    regex: "go_info.*"
+    action: drop
 ```
-
-
 
 ## 查询持久化/可视化
 
@@ -803,7 +801,7 @@
     - 若路由上的continue字段的值为false 则遇到第一个匹配的路由分支后即终止 否则将继续匹配后续的字节点
   - 在Prometheus上定义**告警规则**生成告警通知 发送给Alertmanager
 
-![alert-logic](/Users/lolii/Documents/ilolicon/docs/CloudNative云原生/prometheus/icons/alert-logic.png)
+![alert-logic](./icons/alert-logic.png)
 
 ### Alertmanager特性
 
