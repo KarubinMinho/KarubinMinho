@@ -120,10 +120,10 @@
     ```bash
     # master init
     sudo kubeadm init \ 
-    	--kubernetes-version=v1.20.15 \     # k8s版本
-    	--pod-network-cidr=10.244.0.0/16 \  # pod网段
-    	--service-cidr=10.96.0.0/12 \       # service网段
-    	--ignore-preflight-errors=Swap      # 忽略预检错误
+      --kubernetes-version=v1.20.15 \     # k8s版本
+      --pod-network-cidr=10.244.0.0/16 \  # pod网段
+      --service-cidr=10.96.0.0/12 \       # service网段
+      --ignore-preflight-errors=Swap      # 忽略预检错误
     ```
   
   - nodes: `kubeadm join`
@@ -131,8 +131,8 @@
     ```bash
     # nodes join
     sudo kubeadm join \
-    	10.211.55.57:6443 \
-    	--token hewmhd.fro3dttm001dohys \
+      10.211.55.57:6443 \
+      --token hewmhd.fro3dttm001dohys \
       --discovery-token-ca-cert-hash sha256:826faddde57dc07d0fbf31e7aa809eb5fc22613787a2fc8ab50f55c4e706cd45
     ```
   
@@ -177,7 +177,7 @@
 - 大部分资源的配置清单 主要都有五个主要的部分组成
 
   - apiversion
-    - `kubectl api-versions` # 所属API群组 
+    - `kubectl api-versions` # 所属API群组
     - 标识方式: `group/version` 省略组名则为core group
 
   - kind: 资源类别
@@ -234,7 +234,7 @@ spec:
 
   # 修改镜像中的默认应用
   - command/args
-  https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/	
+  https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
   ```
 
 - 标签
