@@ -98,7 +98,7 @@
 - canel: 上面两种搭配使用
 - ...
 
-![k8s-network](/Users/lolii/WorkSpace/ilolicon/docs/CloudNative云原生/kubernetes/icons/k8s-network.png)
+![k8s-network](./icons/k8s-network.png)
 
 ## Namespace
 
@@ -109,7 +109,7 @@
 
 ![structure](./icons/structure.png)
 
-![structure02](/Users/lolii/WorkSpace/ilolicon/docs/CloudNative云原生/kubernetes/icons/k8s-network-structure02.png)
+![structure02](./icons/k8s-network-structure02.png)
 
 - [kubeadm](https://github.com/kubernetes/kubeadm)
   
@@ -196,7 +196,7 @@
   - kubectl explain pod
   - kubectl explain pod.metadata
 
-### Pod
+### Pod概述
 
 #### 自主式Pod
 
@@ -228,16 +228,16 @@ spec:
   ```yaml
   # kubectl explain pod.spec.containers
   - name: <string>
-  	image: <string>
-  	imagePullPolicy: <string>  # Always Never IfNotPresent
-  	...
-  	
+    image: <string>
+    imagePullPolicy: <string>  # Always Never IfNotPresent
+    ...
+
   # 修改镜像中的默认应用
   - command/args
   https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/	
   ```
 
--  标签
+- 标签
   - key = value
     - key: 字母 数字 _ - .
     - value: 可以为空 只能字母或数字开头及结尾
@@ -260,7 +260,7 @@ spec:
 
 - spec.nodeSelector <map[striong]string>
   - 节点标签选择器
-- spec.nodeName <string>  # 直接指定运行node
+- spec.nodeName `<string>`  # 直接指定运行node
 - annotations
   - 与label不同的地方在于 它不能用于挑选资源对象 仅用于为对象提供**元数据**
   - 没有键长度/值长度限制
@@ -288,7 +288,7 @@ spec:
     - post start
     - pre stop
 
-  ![pod-lifecycle](/Users/lolii/WorkSpace/ilolicon/docs/CloudNative云原生/kubernetes/icons/pod-lifecycle.png)
+  ![pod-lifecycle](./icons/pod-lifecycle.png)
 
 #### Pod容器探针类型
 
@@ -345,7 +345,7 @@ spec:
   - 声明式管理(即可以创建 也可以更新 `kubectl apply -f deployment.yaml`)
   - `kubectl rollout history` 查看滚动历史
 
-![deployment-update](/Users/lolii/WorkSpace/ilolicon/docs/CloudNative云原生/kubernetes/icons/deployment-update.png)
+![deployment-update](./icons/deployment-update.png)
 
 - DaemonSet
   
@@ -390,4 +390,3 @@ spec:
 - kubetnetes
 
 [kubectl-get-commponentstatus-shows-unhealthy](https://stackoverflow.com/questions/63136175/kubectl-get-componentstatus-shows-unhealthy)
-
