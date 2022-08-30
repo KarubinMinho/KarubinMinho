@@ -176,10 +176,10 @@
   - Push Gateway: 接收那些通常由短期作业生成的指标数据的网关 并支持由Prometheus Server进行指标拉取操作
   - Exporters: 用于暴露现有应用程序或服务(不支持Instrumentation)的指标给Prometheus Server
     - node_exporter
-    - Blackbox_exporter
-    - Mysql_exporter
+    - blackbox_exporter
+    - mysql_exporter
     - ...
-  - Alertmanager: 从Prometheus Server接收到**告警通知**后 通过去重 分组 路由等预处理功能后以高效向用户完成告警信息的发送
+  - Alertmanager: 从Prometheus Server接收到**告警通知**后 通过**去重 分组 路由**等预处理功能后以高效向用户完成告警信息的发送
   - Data Visualization: Prometheus Web UI(内建 PromQL表达式浏览器) 及Grafana等
   - Service Discovery: 动态发现待监控的Target 从而完成监控配置的重要组件 在容器化环境尤为有用 该组件目前由Prometheus Server内建支持
 
@@ -211,7 +211,7 @@
 ### 作业(Job)和实例(Instance)
 
 - Instance: 能够接收Prometheus Server数据Scrape操作的每个网络网络端点(endpoint) 即为一个Instance(实例)
-- 通常 具有类似功能的Instance的集合称为一个Job 如: 一个MySQL主从复制集群中的所有MySQL1进程
+- 通常 具有类似功能的Instance的集合称为一个Job 如: 一个MySQL主从复制集群中的所有MySQL进程
 
 ![job-and-instance](./icons/job-and-instance.png)
 
