@@ -1,0 +1,41 @@
+# https://prometheus.io/docs/alerting/latest/configuration/#example
+route:
+  receiver: 'default-receiver'
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+  routes:
+  - receiver: 'critical-receiver'
+    group_wait: 30s
+    group_interval: 2m
+    repeat_interval: 10m
+    matchers:
+    - severity="critical"
+  - receiver: 'warning-receiver'
+    group_by: ['alertname', 'name']
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 30m
+    matchers:
+    - severity="warning"
+
+receivers:
+- name: 'default-receiver'
+  webhook_configs:
+  - url: 'http://prometheus-webhook-dingtalk:8060/dingtalk/webhook_default/send'
+
+- name: 'critical-receiver'
+  webhook_configs:
+  - url: 'http://prometheus-webhook-dingtalk:8060/dingtalk/webhook_critical/send'
+
+- name: 'warning-receiver'
+  webhook_configs:
+  - url: 'http://prometheus-webhook-dingtalk:8060/dingtalk/webhook_emergency/send'
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

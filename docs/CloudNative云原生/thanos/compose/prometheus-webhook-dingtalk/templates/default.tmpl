@@ -1,0 +1,53 @@
+{{ define "default.__text_alert_list" }}{{ range . }}
+---
+**告警级别:** {{ .Labels.severity | upper }}
+
+**触发时间:** {{ dateInZone "2006.01.02 15:04:05" (.StartsAt) "Asia/Shanghai" }}
+
+**告警实例:** {{ .Labels.instance }}
+
+**事件信息:**
+{{ range .Annotations.SortedPairs }}> - {{ .Name }}: {{ .Value | markdown | html }}    
+{{ end }}{{ end }}
+{{ end }}
+
+{{ define "default.__text_alertresolve_list" }}{{ range . }}
+---
+**告警级别:** {{ .Labels.severity | upper }}
+
+**触发时间:** {{ dateInZone "2006.01.02 15:04:05" (.StartsAt) "Asia/Shanghai" }}
+
+**结束时间:** {{ dateInZone "2006.01.02 15:04:05" (.EndsAt) "Asia/Shanghai" }}
+
+**告警实例:** {{ .Labels.instance }}
+
+**事件信息:**
+{{ range .Annotations.SortedPairs }}> - {{ .Name }}: {{ .Value | markdown | html }}    
+{{ end }}{{ end }}
+{{ end }}
+
+{{/* Default */}}
+{{ define "default.title" }}{{ template "__subject" . }}{{ end }}
+{{ define "default.content" }}### **\[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] [{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
+
+{{ if gt (len .Alerts.Firing) 0 -}} 
+---
+### [WARNING](http://grafana_address:3000/) ✘ **检测到故障** {{ template "default.__text_alert_list" .Alerts.Firing }} 
+{{- end }}
+
+{{ if gt (len .Alerts.Resolved) 0 -}}
+---
+### [FIXED](http://grafana_address:3000/) ✘ **故障已修复** {{ template "default.__text_alertresolve_list" .Alerts.Resolved }}
+{{- end }}
+{{- end }}
+---
+
+{{/* Legacy */}}
+{{ define "legacy.title" }}{{ template "__subject" . }}{{ end }}
+{{ define "legacy.content" }}#### **\[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] [{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
+{{ template "__text_alert_list" .Alerts.Firing }}
+{{- end }}
+
+{{/* Following names for compatibility */}}
+{{ define "ding.link.title" }}{{ template "default.title" . }}{{ end }}
+{{ define "ding.link.content" }}{{ template "default.content" . }}{{ end }}
