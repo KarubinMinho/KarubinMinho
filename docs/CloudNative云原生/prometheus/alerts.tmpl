@@ -1,0 +1,73 @@
+{{ define "default.__text_alert_list" }}{{ range . }}
+**告警级别:** {{ .Labels.severity | upper }}
+
+**告警集群:** {{ .Labels.cluster | upper }}
+
+**告警作业:** {{ .Labels.job | upper }}
+
+**触发时间:** {{ dateInZone "2006.01.02 15:04:05" (.StartsAt) "Asia/Shanghai" }}
+
+{{ if ne .Labels.instance "" }}
+**告警实例:** {{ .Labels.instance }}
+{{ end }}
+
+**事件信息:**
+{{ range .Annotations.SortedPairs }}> - {{ .Name }}: {{ .Value | markdown | html }}
+{{ end }}
+---
+{{ end }}
+{{ end }}
+
+{{ define "default.__text_alertresolve_list" }}{{ range . }}
+**告警级别:** {{ .Labels.severity | upper }}
+
+**告警集群:** {{ .Labels.cluster | upper }}
+
+**告警作业:** {{ .Labels.job | upper }}
+
+**触发时间:** {{ dateInZone "2006.01.02 15:04:05" (.StartsAt) "Asia/Shanghai" }}
+
+**结束时间:** {{ dateInZone "2006.01.02 15:04:05" (.EndsAt) "Asia/Shanghai" }}
+
+{{ if ne .Labels.instance "" }}
+**告警实例:** {{ .Labels.instance }}
+{{ end }}
+
+**事件信息:**
+{{ range .Annotations.SortedPairs }}> - {{ .Name }}: {{ .Value | markdown | html }}
+{{ end }}
+---
+{{ end }}
+{{ end }}
+
+{{ define "default.__text_severity" }}{{ range . }}
+{{ if eq .Labels.severity "critical" }}
+[![warning](https://raw.githubusercontent.com/ilolicon/ilolicon/main/docs/Go%E8%AF%AD%E8%A8%80/prometheus/critical.jpg)]({{ .GeneratorURL }})
+{{break}}
+{{ else }}
+[![warning](https://raw.githubusercontent.com/ilolicon/ilolicon/main/docs/Go%E8%AF%AD%E8%A8%80/prometheus/warning.png)]({{ .GeneratorURL }})
+{{break}}
+{{ end }}
+{{ end }}
+{{ end }}
+
+{{/* Default */}}
+{{ define "default.title" }}{{ template "__subject" . }}{{ end }}
+{{ define "default.content" }}
+### \[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] [{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})
+
+{{ if gt (len .Alerts.Firing) 0 -}}
+{{ template "default.__text_severity" .Alerts.Firing }}
+{{ template "default.__text_alert_list" .Alerts.Firing }}
+{{- end }}
+
+{{ if gt (len .Alerts.Resolved) 0 -}}
+![resolved](https://raw.githubusercontent.com/ilolicon/ilolicon/main/docs/Go%E8%AF%AD%E8%A8%80/prometheus/resolved.png)
+{{ template "default.__text_alertresolve_list" .Alerts.Resolved }}
+{{- end }}
+{{- end }}
+---
+
+{{/* Following names for compatibility */}}
+{{ define "ding.link.title" }}{{ template "default.title" . }}{{ end }}
+{{ define "ding.link.content" }}{{ template "default.content" . }}{{ end }}
