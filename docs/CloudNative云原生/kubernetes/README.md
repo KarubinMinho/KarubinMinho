@@ -150,7 +150,7 @@
     k8s.gcr.io/pause                     3.2        2a060e2e7101   2 years ago     484kB  # 创建基础架构容器使用 为Pod提供底层基础结构 无需启动和运行
     ```
 
-## k8s资源概述
+## Kuberntes资源概述
 
 - RESTful风格API
   - GET、POST、DELETE、PUT...
@@ -197,6 +197,8 @@
   - kubectl explain pod.metadata
 
 ### Pod概述
+
+[pods](https://kubernetes.io/zh-cn/docs/concepts/workloads/pods/)
 
 #### 自主式Pod
 
@@ -373,11 +375,142 @@ spec:
 
 - Operator
 
+### Service概述
+
+#### Service代理
+
+[services-networking](https://kubernetes.io/zh-cn/docs/concepts/services-networking/service/)
+
+- userspace
+  - kube-proxy会监视Kubernetes控制平面对Service对象和Endpoints对象的添加和移除操作
+  - 对每个Service它会在本地Node上打开一个端口(随机选择)  任何连接到**代理端口**的请求 都会被代理到Service的后端`Pods`中的某个上面
+    - 使用哪个后端Pod是 kube-proxy 基于`SessionAffinity`来确定的
+  - 最后 它配置 iptables 规则 捕获到达该 Service 的`clusterIP`(是虚拟 IP)和`Port`的请求 并重定向到代理端口 代理端口再代理请求到后端Pod
+    - 默认情况下 用户空间模式下的kube-proxy通过轮转算法选择后端
+  - 流量来回在内核和用户空间切换 效率较低
+
+![services-userspace-overview](./icons/services-userspace-overview.svg)
+
+- iptables
+  - `kube-proxy`会监视Kubernetes控制节点对Service对象和Endpoints对象的添加和移除
+  - 对每个Service 它会配置iptables规则 从而捕获到达该Service的`clusterIP`和端口的请求 进而将请求重定向到 Service 的一组后端中的某个Pod上面
+  - 对于每个Endpoints对象 它也会配置iptables规则 这个规则会选择一个后端组合
+    - 默认的策略是 kube-proxy在iptables模式下随机选择一个后端
+
+  - 使用iptables处理流量具有较低的系统开销 因为流量由Linux netfilter处理 而无需在用户空间和内核空间之间切换 这种方法也可能更可靠
+  - 如果kube-proxy在iptables模式下运行 并且所选的第一个 Pod 没有响应 则连接失败
+    - 这与用户空间模式不同: 在这种情况下 kube-proxy将检测到与第一个Pod的连接已失败 并会自动使用其他后端Pod 重试
+    - 可以使用Pod[就绪探测器](https://kubernetes.io/zh-cn/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) 验证后端Pod可以正常工作 以便iptables模式下的kube-proxy仅看到测试正常的后端 避免将流量通过kube-proxy发送到已知已失败的 Pod
+
+
+![services-iptables-overview](./icons/services-iptables-overview.svg)
+
+
+
+- ipvs
+  - 特性状态： Kubernetes v1.11 [stable]
+  - 在`ipvs`模式下 kube-proxy监视Kubernetes服务和端点 调用`netlink`接口创建相应的IPVS规则 并定期将IPVS规则与Kubernetes服务和端点同步 该控制循环可确保 IPVS 状态与所需状态匹配
+  - 访问服务时 IPVS将流量定向到后端Pod之一
+  - IPVS代理模式基于类似于iptables模式的netfilter挂钩函数 但是使用哈希表作为基础数据结构 并且在内核空间中工作
+    - 这意味着 与iptables模式下的kube-proxy相比 IPVS模式下的kube-proxy重定向通信的延迟要短 并且在同步代理规则时具有更好的性能
+    - 与其他代理模式相比 IPVS模式还支持更高的网络流量吞吐量
+
+  - IPVS提供了更多选项来平衡后端Pod的流量
+    - `rr`: 轮询(Round-Robin)
+    - `lc`: 最少链接(Least Connection) 即打开链接数量最少者优先
+    - `dh`: 目标地址哈希(Destination Hashing)
+    - `sh`: 源地址哈希(Source Hashing)
+    - `sed`: 最短预期延迟(Shortest Expected Delay)
+    - `nq`: 从不排队(Never Queue)
+  - 备注
+    - 要在IPVS模式下运行kube-proxy必须在启动kube-proxy之前使IPVS在节点上可用
+    - 当kube-proxy以IPVS代理模式启动时 它将验证IPVS内核模块是否可用
+      - 如果未检测到IPVS内核模块 则kube-proxy将退回到以iptables代理模式运行
+
+
+![services-ipvs-overview](./icons/services-ipvs-overview.svg)
+
+#### Service类型
+
+- ClusterIP: 通过集群的内部IP暴露服务 选择该值时服务只能够在集群内部访问 这也是默认的`ServiceType`
+- [NodePort](https://kubernetes.io/zh-cn/docs/concepts/services-networking/service/#type-nodeport): 通过每个节点上的IP和静态端口(NodePort)暴露服务  NodePort服务会路由到自动创建的ClusterIP服务
+  - 通过请求 `<节点IP>:<节点端口>` 你可以从集群的外部访问一个NodePort服务
+  - Client -> NodeIP:NodePort -> ClusterIP:ServicePort -> PodIP:containerPort
+  - 为避免单Node压力过大 会在外面再加一层负载均衡
+    - 公有云环境: LBaaS(参考下面LoadBalancer类型)
+- [LoadBalancer](https://kubernetes.io/zh-cn/docs/concepts/services-networking/service/#loadbalancer): 使用云提供商的负载均衡器向外部暴露服务 外部负载均衡器可以将流量路由到自动创建的NodePort服务和ClusterIP服务上
+- [ExternalName](https://kubernetes.io/zh-cn/docs/concepts/services-networking/service/#externalname): 通过返回CNAME和对应值 可以将服务映射到externalName字段的内容(例如`foo.bar.example.com`) 无需创建任何类型代理
+  - FQDN(CoreDNS 内部解析)
+    - CNAME -> FQDN(外部真正的FQDN )
+
+#### Headless Services(无头Service)
+
+- 有时不需要或不想要负载均衡 以及单独的Service IP 遇到这种情况 可以通过指定Cluster IP(`spec.clusterIP`)的值为 `"None"`来创建 `Headless` Service
+- 你可以使用一个无头Service与其他服务发现机制进行接口 而不必与Kubernetes的实现捆绑在一起
+- 对于无头`Services`并不会分配Cluster IP kube-proxy不会处理它们 而且平台也不会为它们进行负载均衡和路由 DNS如何实现自动配置 依赖于Service是否定义了选择算符
+
+### Ingress
+
+![ingress-flow](./icons/ingress-flow.png)
+
+[ingress](https://kubernetes.io/zh-cn/docs/concepts/services-networking/ingress/)
+
+- Service对后端特定类型Pod分类(label selector)
+- Ingress基于上面的分类识别后端Pod 并生成配置信息注入到nginx(需要重载配置)/envoy/traefik等
+
+[ingress-controllers](https://kubernetes.io/zh-cn/docs/concepts/services-networking/ingress-controllers/)
+
+### 存储卷
+
+[kubernetes-storage](https://kubernetes.io/zh-cn/docs/concepts/storage/)
+
+`kubectl explain pods.spec.volumes `
+
+- emptyDir # 临时目录 随pod删除而消失(生命周期同pod)
+  - gitRepo(clone到机器 修改不会同步 需要同步可以自己再做一个sidecar)
+- hostPath # 宿主机路径
+- SAN(iSCSI...)、NAS(nfs、cifs...)
+- 分布式存储
+  - glusterfs、rdb、cephfs
+- 云存储 
+  - EBS、Azure Disk...
+
+#### PV/PVC
+
+![pvc](./icons/pvc.png)
+
+#### StorageClass
+
+- 存储设备需支持RESTful风格的创建请求
+- 根据请求动态创建PV
+
+#### ConfigMap
+
+- ConfigMap是一种 API 对象 用来将非机密性的数据保存到键值对中
+- 使用时[Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/)可以将其用作环境变量、命令行参数或者存储卷中的配置文件
+- ConfigMap将你的环境配置信息和[容器镜像](https://kubernetes.io/zh-cn/docs/reference/glossary/?all=true#term-image)解耦 便于应用配置的修改
+
+##### 容器化配置应用方式
+
+- 自定义命令行参数
+  - args: []
+- 把配置文件直接打包至镜像
+- 环境变量
+  - CloudNative的应用程序一般可直接通过环境变量加载配置
+  - 通过entrypoint脚本来预处理变量为配置文件中的配置信息
+- 存储卷
+
+#### Secret
+
+- Secret是一种包含少量敏感信息例如密码、令牌或密钥的对象 这样的信息可能会被放在[Pod](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/)规约中或者镜像中
+- 使用Secret意味着你不需要在应用程序代码中包含机密数据
+- Secret类似于[ConfigMap](https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/configure-pod-configmap/)但专门用于保存机密数据
+
 ## Helm
 
 - 类似yum
 
-## Some Links
+## Reference
 
 - ubuntu
 
@@ -390,3 +523,6 @@ spec:
 - kubetnetes
 
 [kubectl-get-commponentstatus-shows-unhealthy](https://stackoverflow.com/questions/63136175/kubectl-get-componentstatus-shows-unhealthy)
+
+
+
