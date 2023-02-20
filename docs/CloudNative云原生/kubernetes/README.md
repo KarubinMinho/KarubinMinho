@@ -504,7 +504,86 @@ spec:
 
 - Secret是一种包含少量敏感信息例如密码、令牌或密钥的对象 这样的信息可能会被放在[Pod](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/)规约中或者镜像中
 - 使用Secret意味着你不需要在应用程序代码中包含机密数据
-- Secret类似于[ConfigMap](https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/configure-pod-configmap/)但专门用于保存机密数据
+- Secret类似于[ConfigMap](https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/configure-pod-configmap/)但专门用于保存敏感数据
+
+## StatefulSet控制器
+
+- CoreOS Operator
+- cattle/pet # 一个关注群体 一个关注个体(和无状态应用的区别)
+- PetSet(1.3) -> StatefulSet(1.5+)
+- StatefulSet主要用于管理有以下特性的应用程序
+  -  稳定且唯一的网络标识符
+  - 稳定且持久的存储
+  - 有序、平滑的部署和扩展
+  - 有序、平滑的终止和删除
+  - 有序的滚动更新
+- 一般来说 一个典型的StatefulSet由三个组件组成
+  - handless service              # 无头服务 确保名称唯一
+  - StatefulSet                         # 控制器
+  - volumeClaimTemplate # 存储卷申请模版(不能使用同一存储卷 pod模版创建的存储卷都是一样的 所以需要卷申请模版)
+
+- `kubelet explain sts.spec.updateStrategy.rollingUpdate`
+  - partition <inter> # 控制更新的Pod
+  - partition: N         # 大于等于编号N的Pod将被更新 默认值: 0
+
+## 认证及ServiceAccount
+
+### 认证授权
+
+- 认证(支持多种认证方式) # 认证插件
+  - 令牌认证 bearer token
+  - ssl认证(确认服务端/客户端身份) 双向证书认证(https)
+  - ...
+- 授权检查(权限) # 授权插件
+  - RBAC # kubeadm部署的集群强制开启RBAC 
+  - ...
+- 准入控制(关联的其他资源或操作 是否有权限 进一步补充授权机制) 
+- API Server需要信息去识别客户端的操作
+  - user: username + uid
+  - group
+  - extra
+  - API(请求的Kubernetes API)
+    - Request Path
+      - `kubectl proxy --port=8080`
+      - `curl http://localhost:8080/api/v1/namespaces`
+      - `curl http://localhost:8080/apis/apps/v1/namespaces/default/deployments/myapp-deploy/`
+    - HTTP request verb
+      - GET POST PUT DELETE
+      - get list create update patch watch proxy redirect delete deletecollection
+    - Resources
+    - SubResources
+    - Namespace
+    - API Group
+
+### ServiceAccount
+
+- 访问APIServer的两种客户端
+  - kubectl/dashborad 集群外部客户端(userAccount)
+  - pod 集群内部客户端(serviceAccount)
+    - `kubectl explain pods.spec.serviceAccountName`
+- kubeconfig
+  - `kubectl config view`
+
+### RBAC授权
+
+- 授权插件
+  - Node
+  - ABAC(*Attribute-based access control*)
+  - RBAC(*Role-based access contro*)
+  - Webhook
+
+![k8s-RBAC](./icons/k8s-RBAC.png)
+
+- K8S-RBAC
+  - role
+    - operations
+    - objects
+  - rolebinding
+    - user account OR service account
+    - role
+  - `kubectl create role pods-reader --verb=get,list,watch --resource=pods --dry-run -o yaml `
+
+![role-binding](./icons/role-binding.png)
 
 ## Helm
 

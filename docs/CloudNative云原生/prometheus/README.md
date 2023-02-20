@@ -908,3 +908,53 @@ routes:
 ## Alertmanager高可用
 
 [alertmanager-HA](https://github.com/prometheus/alertmanager#high-availability)
+
+## PromQL Example
+
+```bash
+# min()函数聚合指标
+# min(ping_rtt_mean_seconds{region="San Jose"}) by (region, target_region)
+# min(ping_rtt_mean_seconds{target_region="Ashburn"}) by (region, target_region)
+
+# label_repalce()构建bridge_region标签 用于向量匹配
+# label_replace(min(ping_rtt_mean_seconds{region="San Jose"}) by (region, target_region), "bridge_region", "$1", "target_region", "(.+)")
+# label_replace(min(ping_rtt_mean_seconds{target_region="Ashburn"}) by (region, target_region), "bridge_region", "$1", "region", "(.+)")
+
+# 进行向量匹配
+# label_replace(
+#     min by (region, target_region) (ping_rtt_mean_seconds{region="San Jose"}),
+#     "bridge_region",
+#     "$1",
+#     "target_region",
+#     "(.+)"
+#   ) * 1000
+# + on(bridge_region) group_left(target_region)
+#     label_replace(
+#       min by (region, target_region) (ping_rtt_mean_seconds{target_region="Ashburn"}),
+#       "bridge_region",
+#       "$1",
+#       "region",
+#       "(.+)"
+#     ）* 1000
+
+# 通过IP分组进行向量匹配 并通过label_join拼接中转信息
+# sort(
+#     label_replace(ping_rtt_mean_seconds{region="San Jose"}, "bridge_ip", "$1", "target", "(.+)") * 1000
+#   + on (bridge_ip) group_right (region, isp)
+#       label_join(
+#         label_replace(
+#           ping_rtt_mean_seconds{target_region="Ashburn"},
+#           "bridge_ip",
+#           "$1",
+#           "instance",
+#           "(.+):9427"
+#         ),
+#         "bridge_info",
+#         "-",
+#         "isp",
+#         "region"
+#       )
+#     *
+#       1000
+# )
+```
